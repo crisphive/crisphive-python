@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "crisphive"
-version = "0.1.0"
-description = "CrispHive Developer API"
-authors = ["OpenAPI Generator Community <team@openapitools.org>"]
-license = "NoLicense"
+version = "0.2.0"
+description = "Official Python SDK for the Crisphive API."
+authors = ["Crisphive <developer@crisphive.com>"]
+license = "MIT"
 readme = "README.md"
 repository = "https://github.com/crisphive/crisphive-python"
-keywords = ["OpenAPI", "OpenAPI-Generator", "CrispHive Developer API"]
+keywords = ["crisphive", "api", "sdk"]
 include = ["crisphive/py.typed"]
 
 [tool.poetry.dependencies]
