@@ -105,6 +105,7 @@ class CustomerApi:
             '200': "CreateCustomer200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -181,6 +182,7 @@ class CustomerApi:
             '200': "CreateCustomer200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -257,6 +259,7 @@ class CustomerApi:
             '200': "CreateCustomer200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -404,6 +407,7 @@ class CustomerApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -474,6 +478,7 @@ class CustomerApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -544,6 +549,7 @@ class CustomerApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -674,6 +680,7 @@ class CustomerApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetCustomer200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -744,6 +751,7 @@ class CustomerApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetCustomer200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -814,6 +822,7 @@ class CustomerApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetCustomer200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -891,7 +900,8 @@ class CustomerApi:
     @validate_call
     def list_customers(
         self,
-        q: Annotated[Optional[StrictStr], Field(description="Search name, UID, phone, email")] = None,
+        q: Annotated[Optional[StrictStr], Field(description="Fuzzy search over name, UID, phone, email")] = None,
+        phone: Annotated[Optional[StrictStr], Field(description="EXACT caller lookup by phone in E.164 with the leading + (e.g. +16135550188). Separators are stripped, so '+1 (613) 555-0188' works; a bare national number without a country code is refused with PHONE_INVALID. Use this rather than q to identify a caller — q is a substring match and can return the wrong person.")] = None,
         tier: Annotated[Optional[List[StrictStr]], Field(description="Filter by tier: regular|vip (repeatable)")] = None,
         status: Annotated[Optional[StrictStr], Field(description="Filter by status: active|inactive")] = None,
         preferred_technician_id: Annotated[Optional[StrictStr], Field(description="Filter by preferred technician UUID")] = None,
@@ -916,8 +926,10 @@ class CustomerApi:
 
         Returns a paginated, searchable directory of the business's customer records — the customer database (CRM) behind every booking and work order. Supports the `since`/`next_since` cursor for incremental sync into an external CRM, ERP or marketing tool.
 
-        :param q: Search name, UID, phone, email
+        :param q: Fuzzy search over name, UID, phone, email
         :type q: str
+        :param phone: EXACT caller lookup by phone in E.164 with the leading + (e.g. +16135550188). Separators are stripped, so '+1 (613) 555-0188' works; a bare national number without a country code is refused with PHONE_INVALID. Use this rather than q to identify a caller — q is a substring match and can return the wrong person.
+        :type phone: str
         :param tier: Filter by tier: regular|vip (repeatable)
         :type tier: List[str]
         :param status: Filter by status: active|inactive
@@ -956,6 +968,7 @@ class CustomerApi:
 
         _param = self._list_customers_serialize(
             q=q,
+            phone=phone,
             tier=tier,
             status=status,
             preferred_technician_id=preferred_technician_id,
@@ -973,6 +986,7 @@ class CustomerApi:
             '200': "ListCustomers200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -989,7 +1003,8 @@ class CustomerApi:
     @validate_call
     def list_customers_with_http_info(
         self,
-        q: Annotated[Optional[StrictStr], Field(description="Search name, UID, phone, email")] = None,
+        q: Annotated[Optional[StrictStr], Field(description="Fuzzy search over name, UID, phone, email")] = None,
+        phone: Annotated[Optional[StrictStr], Field(description="EXACT caller lookup by phone in E.164 with the leading + (e.g. +16135550188). Separators are stripped, so '+1 (613) 555-0188' works; a bare national number without a country code is refused with PHONE_INVALID. Use this rather than q to identify a caller — q is a substring match and can return the wrong person.")] = None,
         tier: Annotated[Optional[List[StrictStr]], Field(description="Filter by tier: regular|vip (repeatable)")] = None,
         status: Annotated[Optional[StrictStr], Field(description="Filter by status: active|inactive")] = None,
         preferred_technician_id: Annotated[Optional[StrictStr], Field(description="Filter by preferred technician UUID")] = None,
@@ -1014,8 +1029,10 @@ class CustomerApi:
 
         Returns a paginated, searchable directory of the business's customer records — the customer database (CRM) behind every booking and work order. Supports the `since`/`next_since` cursor for incremental sync into an external CRM, ERP or marketing tool.
 
-        :param q: Search name, UID, phone, email
+        :param q: Fuzzy search over name, UID, phone, email
         :type q: str
+        :param phone: EXACT caller lookup by phone in E.164 with the leading + (e.g. +16135550188). Separators are stripped, so '+1 (613) 555-0188' works; a bare national number without a country code is refused with PHONE_INVALID. Use this rather than q to identify a caller — q is a substring match and can return the wrong person.
+        :type phone: str
         :param tier: Filter by tier: regular|vip (repeatable)
         :type tier: List[str]
         :param status: Filter by status: active|inactive
@@ -1054,6 +1071,7 @@ class CustomerApi:
 
         _param = self._list_customers_serialize(
             q=q,
+            phone=phone,
             tier=tier,
             status=status,
             preferred_technician_id=preferred_technician_id,
@@ -1071,6 +1089,7 @@ class CustomerApi:
             '200': "ListCustomers200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -1087,7 +1106,8 @@ class CustomerApi:
     @validate_call
     def list_customers_without_preload_content(
         self,
-        q: Annotated[Optional[StrictStr], Field(description="Search name, UID, phone, email")] = None,
+        q: Annotated[Optional[StrictStr], Field(description="Fuzzy search over name, UID, phone, email")] = None,
+        phone: Annotated[Optional[StrictStr], Field(description="EXACT caller lookup by phone in E.164 with the leading + (e.g. +16135550188). Separators are stripped, so '+1 (613) 555-0188' works; a bare national number without a country code is refused with PHONE_INVALID. Use this rather than q to identify a caller — q is a substring match and can return the wrong person.")] = None,
         tier: Annotated[Optional[List[StrictStr]], Field(description="Filter by tier: regular|vip (repeatable)")] = None,
         status: Annotated[Optional[StrictStr], Field(description="Filter by status: active|inactive")] = None,
         preferred_technician_id: Annotated[Optional[StrictStr], Field(description="Filter by preferred technician UUID")] = None,
@@ -1112,8 +1132,10 @@ class CustomerApi:
 
         Returns a paginated, searchable directory of the business's customer records — the customer database (CRM) behind every booking and work order. Supports the `since`/`next_since` cursor for incremental sync into an external CRM, ERP or marketing tool.
 
-        :param q: Search name, UID, phone, email
+        :param q: Fuzzy search over name, UID, phone, email
         :type q: str
+        :param phone: EXACT caller lookup by phone in E.164 with the leading + (e.g. +16135550188). Separators are stripped, so '+1 (613) 555-0188' works; a bare national number without a country code is refused with PHONE_INVALID. Use this rather than q to identify a caller — q is a substring match and can return the wrong person.
+        :type phone: str
         :param tier: Filter by tier: regular|vip (repeatable)
         :type tier: List[str]
         :param status: Filter by status: active|inactive
@@ -1152,6 +1174,7 @@ class CustomerApi:
 
         _param = self._list_customers_serialize(
             q=q,
+            phone=phone,
             tier=tier,
             status=status,
             preferred_technician_id=preferred_technician_id,
@@ -1169,6 +1192,7 @@ class CustomerApi:
             '200': "ListCustomers200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -1181,6 +1205,7 @@ class CustomerApi:
     def _list_customers_serialize(
         self,
         q,
+        phone,
         tier,
         status,
         preferred_technician_id,
@@ -1214,6 +1239,10 @@ class CustomerApi:
         if q is not None:
             
             _query_params.append(('q', q))
+            
+        if phone is not None:
+            
+            _query_params.append(('phone', phone))
             
         if tier is not None:
             
@@ -1300,7 +1329,7 @@ class CustomerApi:
     ) -> ResponseEnvelope:
         """Update a customer
 
-        Replaces mutable fields on a customer record — two-way CRM sync friendly (push changes from your system of record). Pass service_area_id=\"\" to clear the service area. Address fields (including latitude/longitude) live under the nested `address` object.
+        PARTIAL update — send only the fields you are changing; anything you OMIT is left exactly as stored (two-way CRM sync friendly: push one field from your system of record without re-sending the record). To CLEAR a field, send it as an empty string: uid, phone, email, notes, preferred_technician_id, service_area_id. `tier` and `status` are enums with no empty member, so an empty value there is ignored rather than stored. `full_name` cannot be set to empty. The nested `address` object is all-or-nothing: omit it to leave the stored address (and its coordinates) untouched; when present it REPLACES the whole block, and missing latitude/longitude are geocoded from the address. A customer must keep at least one contact channel — an update that would clear both phone and email is refused with PHONE_OR_EMAIL_REQUIRED.
 
         :param id: Customer ID (UUID) (required)
         :type id: str
@@ -1341,6 +1370,7 @@ class CustomerApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -1376,7 +1406,7 @@ class CustomerApi:
     ) -> ApiResponse[ResponseEnvelope]:
         """Update a customer
 
-        Replaces mutable fields on a customer record — two-way CRM sync friendly (push changes from your system of record). Pass service_area_id=\"\" to clear the service area. Address fields (including latitude/longitude) live under the nested `address` object.
+        PARTIAL update — send only the fields you are changing; anything you OMIT is left exactly as stored (two-way CRM sync friendly: push one field from your system of record without re-sending the record). To CLEAR a field, send it as an empty string: uid, phone, email, notes, preferred_technician_id, service_area_id. `tier` and `status` are enums with no empty member, so an empty value there is ignored rather than stored. `full_name` cannot be set to empty. The nested `address` object is all-or-nothing: omit it to leave the stored address (and its coordinates) untouched; when present it REPLACES the whole block, and missing latitude/longitude are geocoded from the address. A customer must keep at least one contact channel — an update that would clear both phone and email is refused with PHONE_OR_EMAIL_REQUIRED.
 
         :param id: Customer ID (UUID) (required)
         :type id: str
@@ -1417,6 +1447,7 @@ class CustomerApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -1452,7 +1483,7 @@ class CustomerApi:
     ) -> RESTResponseType:
         """Update a customer
 
-        Replaces mutable fields on a customer record — two-way CRM sync friendly (push changes from your system of record). Pass service_area_id=\"\" to clear the service area. Address fields (including latitude/longitude) live under the nested `address` object.
+        PARTIAL update — send only the fields you are changing; anything you OMIT is left exactly as stored (two-way CRM sync friendly: push one field from your system of record without re-sending the record). To CLEAR a field, send it as an empty string: uid, phone, email, notes, preferred_technician_id, service_area_id. `tier` and `status` are enums with no empty member, so an empty value there is ignored rather than stored. `full_name` cannot be set to empty. The nested `address` object is all-or-nothing: omit it to leave the stored address (and its coordinates) untouched; when present it REPLACES the whole block, and missing latitude/longitude are geocoded from the address. A customer must keep at least one contact channel — an update that would clear both phone and email is refused with PHONE_OR_EMAIL_REQUIRED.
 
         :param id: Customer ID (UUID) (required)
         :type id: str
@@ -1493,6 +1524,7 @@ class CustomerApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",

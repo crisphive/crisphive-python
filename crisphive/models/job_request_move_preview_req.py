@@ -17,8 +17,8 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -26,10 +26,11 @@ class JobRequestMovePreviewReq(BaseModel):
     """
     JobRequestMovePreviewReq
     """ # noqa: E501
+    after_hours_override: Optional[StrictBool] = Field(default=None, description="AfterHoursOverride — drop the non-working-day rejection for a P0 whose technician the coordinator has already phoned. P0 only (JOB_REQUEST_AFTER_HOURS_REQUIRES_P0 otherwise), and the preview then carries an AFTER_HOURS warning. Commit must repeat what the preview was run with.")
     mode: StrictStr = Field(description="Cascade mode for displaced jobs: overtime = stay same-day (tech works late); next_day = overflow rolls to the next working day.")
     start_at: StrictStr = Field(description="New start — business-local naive datetime, no offset. Must be in the future.")
     technician_id: StrictStr = Field(description="Target technician — may equal the current tech (pure time move) or differ (manual reassign).")
-    __properties: ClassVar[List[str]] = ["mode", "start_at", "technician_id"]
+    __properties: ClassVar[List[str]] = ["after_hours_override", "mode", "start_at", "technician_id"]
 
     @field_validator('mode')
     def mode_validate_enum(cls, value):
@@ -89,6 +90,7 @@ class JobRequestMovePreviewReq(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "after_hours_override": obj.get("after_hours_override"),
             "mode": obj.get("mode"),
             "start_at": obj.get("start_at"),
             "technician_id": obj.get("technician_id")

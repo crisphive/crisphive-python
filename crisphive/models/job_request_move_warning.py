@@ -20,6 +20,8 @@ import json
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
+from crisphive.models.job_date_business_range import JobDateBusinessRange
+from crisphive.models.job_request_blocker import JobRequestBlocker
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -27,13 +29,15 @@ class JobRequestMoveWarning(BaseModel):
     """
     JobRequestMoveWarning
     """ # noqa: E501
-    code: Optional[StrictStr] = Field(default=None, description="Warning kind: TECH_NOT_FEASIBLE | PUSHED_OUTSIDE_WINDOW | OVERTIME | TIME_OFF_OVERLAP | VEHICLE_CONFLICT.")
+    blockers: Optional[List[JobRequestBlocker]] = Field(default=None, description="Every hard filter that refused the technician, most-structural first (TECH_NOT_FEASIBLE only). blockers[0] is the row Reason is derived from.")
+    code: Optional[StrictStr] = Field(default=None, description="Warning kind: MOVED_OUTSIDE_WINDOW | TECH_NOT_FEASIBLE | PUSHED_OUTSIDE_WINDOW | OVERTIME | TIME_OFF_OVERLAP | CALENDAR_OVERLAP | VEHICLE_CONFLICT | AFTER_HOURS.  CALENDAR_OVERLAP is a SEPARATE value from TIME_OFF_OVERLAP on purpose: approved time off is a record the coordinator can open, a personal calendar event is one we cannot see at all.")
+    customer_window: Optional[List[JobDateBusinessRange]] = Field(default=None, description="MOVED_OUTSIDE_WINDOW only: the customer-confirmed business-local ranges the job was booked into, so the board can show what the customer requested next to the override warning.")
     earliest_feasible_at: Optional[datetime] = Field(default=None, description="First same-day time the target technician CAN be on site (UTC) — only with reason=cannot_arrive_in_time; suggest it as the drop slot.")
-    job_id: Optional[StrictStr] = Field(default=None, description="The displaced job this warning is about (per-job warnings only).")
+    job_id: Optional[StrictStr] = Field(default=None, description="The job this warning is about (per-job warnings only).")
     message: Optional[StrictStr] = Field(default=None, description="Human-readable explanation.")
     minutes: Optional[StrictInt] = Field(default=None, description="OVERTIME only: the largest overrun in minutes past the working-day end. Omitted otherwise.")
-    reason: Optional[StrictStr] = Field(default=None, description="Machine cause, TECH_NOT_FEASIBLE only: cannot_arrive_in_time (see earliest_feasible_at) | missing_required_skills | not_available_today | not_lead_tier.")
-    __properties: ClassVar[List[str]] = ["code", "earliest_feasible_at", "job_id", "message", "minutes", "reason"]
+    reason: Optional[StrictStr] = Field(default=None, description="Machine cause, TECH_NOT_FEASIBLE only. Blockers[0].kind, or not_available_today when the diagnosis was unavailable. EXTEND-ONLY: a client switching on this MUST carry a default branch.  calendar_conflict is the one value NOT in smartassign.BlockerKind: it is raised by the crew-assign path, never by ExplainInfeasibility, so it never appears in Blockers. A busy window on the technician's own PERSONAL calendar covers the visit. It is kept separate from on_time_off because approved leave is a record the coordinator can open and weigh, while this one is the obstacle we deliberately cannot see, so the action is a phone call. It may arrive alongside earliest_feasible_at.")
+    __properties: ClassVar[List[str]] = ["blockers", "code", "customer_window", "earliest_feasible_at", "job_id", "message", "minutes", "reason"]
 
     @field_validator('code')
     def code_validate_enum(cls, value):
@@ -41,8 +45,8 @@ class JobRequestMoveWarning(BaseModel):
         if value is None:
             return value
 
-        if value not in set(['TECH_NOT_FEASIBLE', 'PUSHED_OUTSIDE_WINDOW', 'OVERTIME', 'TIME_OFF_OVERLAP', 'VEHICLE_CONFLICT']):
-            raise ValueError("must be one of enum values ('TECH_NOT_FEASIBLE', 'PUSHED_OUTSIDE_WINDOW', 'OVERTIME', 'TIME_OFF_OVERLAP', 'VEHICLE_CONFLICT')")
+        if value not in set(['MOVED_OUTSIDE_WINDOW', 'TECH_NOT_FEASIBLE', 'PUSHED_OUTSIDE_WINDOW', 'OVERTIME', 'TIME_OFF_OVERLAP', 'CALENDAR_OVERLAP', 'VEHICLE_CONFLICT', 'AFTER_HOURS']):
+            raise ValueError("must be one of enum values ('MOVED_OUTSIDE_WINDOW', 'TECH_NOT_FEASIBLE', 'PUSHED_OUTSIDE_WINDOW', 'OVERTIME', 'TIME_OFF_OVERLAP', 'CALENDAR_OVERLAP', 'VEHICLE_CONFLICT', 'AFTER_HOURS')")
         return value
 
     @field_validator('reason')
@@ -51,8 +55,8 @@ class JobRequestMoveWarning(BaseModel):
         if value is None:
             return value
 
-        if value not in set(['cannot_arrive_in_time', 'missing_required_skills', 'not_available_today', 'not_lead_tier']):
-            raise ValueError("must be one of enum values ('cannot_arrive_in_time', 'missing_required_skills', 'not_available_today', 'not_lead_tier')")
+        if value not in set(['outside_service_area', 'missing_required_skills', 'not_lead_tier', 'no_working_day', 'on_time_off', 'off_shift', 'occupied', 'visit_too_long', 'cannot_arrive_in_time', 'calendar_conflict', 'not_available_today']):
+            raise ValueError("must be one of enum values ('outside_service_area', 'missing_required_skills', 'not_lead_tier', 'no_working_day', 'on_time_off', 'off_shift', 'occupied', 'visit_too_long', 'cannot_arrive_in_time', 'calendar_conflict', 'not_available_today')")
         return value
 
     model_config = ConfigDict(
@@ -94,6 +98,20 @@ class JobRequestMoveWarning(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in blockers (list)
+        _items = []
+        if self.blockers:
+            for _item_blockers in self.blockers:
+                if _item_blockers:
+                    _items.append(_item_blockers.to_dict())
+            _dict['blockers'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in customer_window (list)
+        _items = []
+        if self.customer_window:
+            for _item_customer_window in self.customer_window:
+                if _item_customer_window:
+                    _items.append(_item_customer_window.to_dict())
+            _dict['customer_window'] = _items
         return _dict
 
     @classmethod
@@ -106,7 +124,9 @@ class JobRequestMoveWarning(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "blockers": [JobRequestBlocker.from_dict(_item) for _item in obj["blockers"]] if obj.get("blockers") is not None else None,
             "code": obj.get("code"),
+            "customer_window": [JobDateBusinessRange.from_dict(_item) for _item in obj["customer_window"]] if obj.get("customer_window") is not None else None,
             "earliest_feasible_at": obj.get("earliest_feasible_at"),
             "job_id": obj.get("job_id"),
             "message": obj.get("message"),

@@ -18,7 +18,7 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,12 +29,16 @@ class JobType(BaseModel):
     """ # noqa: E501
     business_id: Optional[StrictStr] = Field(default=None, description="UUID of the business that owns this job type.")
     created_at: Optional[datetime] = Field(default=None, description="When the job type was created (RFC3339).")
+    default_demobilization_minutes: Optional[StrictInt] = Field(default=None, description="Default demobilization minutes applied with the default duration. Absent = none.")
+    default_duration_minutes: Optional[StrictInt] = Field(default=None, description="Default work duration in minutes used when a quote omits job_duration_minutes. Absent = no default: a quote for this type must send a duration.")
+    default_mobilization_minutes: Optional[StrictInt] = Field(default=None, description="Default mobilization minutes applied with the default duration. Absent = none.")
     id: Optional[StrictStr] = Field(default=None, description="Job type UUID — the stable identifier used in every job-type endpoint.")
-    is_system: Optional[StrictBool] = Field(default=None, description="True for platform-seeded system rows, which cannot be modified or deleted.")
+    is_default: Optional[StrictBool] = Field(default=None, description="True for the business's DEFAULT job type (the seeded \"General\"): a job booked without a job_type_id gets it, and a job with no job type is quoted from its default bundle. It cannot be deleted or deactivated and its default duration cannot be cleared (it can be changed). Exactly one per business per environment (live and sandbox each have their own).")
+    is_system: Optional[StrictBool] = Field(default=None, description="True for platform-seeded system rows: their name and status cannot be modified and they cannot be deleted; their default quote bundle is editable.")
     name: Optional[StrictStr] = Field(default=None, description="Job type name, localized server-side to the request locale.")
     status: Optional[StrictStr] = Field(default=None, description="Lifecycle status. Inactive types remain on historical jobs but cannot be selected for new requests.")
     updated_at: Optional[datetime] = Field(default=None, description="When the job type was last modified (RFC3339).")
-    __properties: ClassVar[List[str]] = ["business_id", "created_at", "id", "is_system", "name", "status", "updated_at"]
+    __properties: ClassVar[List[str]] = ["business_id", "created_at", "default_demobilization_minutes", "default_duration_minutes", "default_mobilization_minutes", "id", "is_default", "is_system", "name", "status", "updated_at"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
@@ -99,7 +103,11 @@ class JobType(BaseModel):
         _obj = cls.model_validate({
             "business_id": obj.get("business_id"),
             "created_at": obj.get("created_at"),
+            "default_demobilization_minutes": obj.get("default_demobilization_minutes"),
+            "default_duration_minutes": obj.get("default_duration_minutes"),
+            "default_mobilization_minutes": obj.get("default_mobilization_minutes"),
             "id": obj.get("id"),
+            "is_default": obj.get("is_default"),
             "is_system": obj.get("is_system"),
             "name": obj.get("name"),
             "status": obj.get("status"),

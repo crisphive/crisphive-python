@@ -19,12 +19,17 @@ from typing_extensions import Annotated
 from pydantic import Field, StrictBool, StrictFloat, StrictInt, StrictStr
 from typing import Optional, Union
 from typing_extensions import Annotated
+from crisphive.models.book_and_confirm_job_request200_response import BookAndConfirmJobRequest200Response
+from crisphive.models.commit_absence_resolve200_response import CommitAbsenceResolve200Response
 from crisphive.models.commit_emergency_reschedule200_response import CommitEmergencyReschedule200Response
 from crisphive.models.commit_job_request_move200_response import CommitJobRequestMove200Response
 from crisphive.models.create_job_request200_response import CreateJobRequest200Response
 from crisphive.models.get_job_request200_response import GetJobRequest200Response
 from crisphive.models.get_job_request_timeline200_response import GetJobRequestTimeline200Response
 from crisphive.models.get_technician_schedule200_response import GetTechnicianSchedule200Response
+from crisphive.models.job_request_absence_commit_request import JobRequestAbsenceCommitRequest
+from crisphive.models.job_request_absence_preview_request import JobRequestAbsencePreviewRequest
+from crisphive.models.job_request_book_and_confirm_request import JobRequestBookAndConfirmRequest
 from crisphive.models.job_request_confirm_request import JobRequestConfirmRequest
 from crisphive.models.job_request_create_request import JobRequestCreateRequest
 from crisphive.models.job_request_emergency_candidates_request import JobRequestEmergencyCandidatesRequest
@@ -62,6 +67,623 @@ class JobRequestBusinessApi:
 
 
     @validate_call
+    def book_and_confirm_job_request(
+        self,
+        job_request_book_and_confirm_request: Annotated[JobRequestBookAndConfirmRequest, Field(description="Quick booking")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Makes retries safe: a repeat send with the same key returns the original result instead of booking again")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> BookAndConfirmJobRequest200Response:
+        """Book, schedule and confirm a job in one call
+
+        Creates the job, quotes it (job_duration_minutes, or the job type's default_duration_minutes) and confirms it at scheduled_at on the customer's behalf — the dashboard's \"book for a caller\" in a single request, built for voice agents and automation platforms that cannot run create → quote → slots → confirm.  Customer: send `customer_id`, or `customer` (+ `address`) to match-or-create by phone/email — a caller who already exists is matched, never duplicated. Find a caller first with listCustomers?phone=.  Every input is validated BEFORE anything is written (time and business timezone, future start, a duration or a job-type default, active job type, phone format); those failures are ordinary 4xx and create nothing.  ⚠️ Once the job is created it is never discarded, and the call answers 200 even if scheduling then fails: `confirmed: false` with `refusal` (stage + the exact error_code/data the quote or confirm endpoint would have returned, e.g. JOB_REQUEST_NO_TECHNICIAN_AVAILABLE with blockers). The job is then quoted and waiting in the coordinator's queue — tell the caller the office will confirm a time. Retry with the SAME Idempotency-Key to replay the result; a new key books a second job.
+
+        :param job_request_book_and_confirm_request: Quick booking (required)
+        :type job_request_book_and_confirm_request: JobRequestBookAndConfirmRequest
+        :param idempotency_key: Makes retries safe: a repeat send with the same key returns the original result instead of booking again
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._book_and_confirm_job_request_serialize(
+            job_request_book_and_confirm_request=job_request_book_and_confirm_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "BookAndConfirmJobRequest200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '422': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def book_and_confirm_job_request_with_http_info(
+        self,
+        job_request_book_and_confirm_request: Annotated[JobRequestBookAndConfirmRequest, Field(description="Quick booking")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Makes retries safe: a repeat send with the same key returns the original result instead of booking again")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[BookAndConfirmJobRequest200Response]:
+        """Book, schedule and confirm a job in one call
+
+        Creates the job, quotes it (job_duration_minutes, or the job type's default_duration_minutes) and confirms it at scheduled_at on the customer's behalf — the dashboard's \"book for a caller\" in a single request, built for voice agents and automation platforms that cannot run create → quote → slots → confirm.  Customer: send `customer_id`, or `customer` (+ `address`) to match-or-create by phone/email — a caller who already exists is matched, never duplicated. Find a caller first with listCustomers?phone=.  Every input is validated BEFORE anything is written (time and business timezone, future start, a duration or a job-type default, active job type, phone format); those failures are ordinary 4xx and create nothing.  ⚠️ Once the job is created it is never discarded, and the call answers 200 even if scheduling then fails: `confirmed: false` with `refusal` (stage + the exact error_code/data the quote or confirm endpoint would have returned, e.g. JOB_REQUEST_NO_TECHNICIAN_AVAILABLE with blockers). The job is then quoted and waiting in the coordinator's queue — tell the caller the office will confirm a time. Retry with the SAME Idempotency-Key to replay the result; a new key books a second job.
+
+        :param job_request_book_and_confirm_request: Quick booking (required)
+        :type job_request_book_and_confirm_request: JobRequestBookAndConfirmRequest
+        :param idempotency_key: Makes retries safe: a repeat send with the same key returns the original result instead of booking again
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._book_and_confirm_job_request_serialize(
+            job_request_book_and_confirm_request=job_request_book_and_confirm_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "BookAndConfirmJobRequest200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '422': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def book_and_confirm_job_request_without_preload_content(
+        self,
+        job_request_book_and_confirm_request: Annotated[JobRequestBookAndConfirmRequest, Field(description="Quick booking")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Makes retries safe: a repeat send with the same key returns the original result instead of booking again")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Book, schedule and confirm a job in one call
+
+        Creates the job, quotes it (job_duration_minutes, or the job type's default_duration_minutes) and confirms it at scheduled_at on the customer's behalf — the dashboard's \"book for a caller\" in a single request, built for voice agents and automation platforms that cannot run create → quote → slots → confirm.  Customer: send `customer_id`, or `customer` (+ `address`) to match-or-create by phone/email — a caller who already exists is matched, never duplicated. Find a caller first with listCustomers?phone=.  Every input is validated BEFORE anything is written (time and business timezone, future start, a duration or a job-type default, active job type, phone format); those failures are ordinary 4xx and create nothing.  ⚠️ Once the job is created it is never discarded, and the call answers 200 even if scheduling then fails: `confirmed: false` with `refusal` (stage + the exact error_code/data the quote or confirm endpoint would have returned, e.g. JOB_REQUEST_NO_TECHNICIAN_AVAILABLE with blockers). The job is then quoted and waiting in the coordinator's queue — tell the caller the office will confirm a time. Retry with the SAME Idempotency-Key to replay the result; a new key books a second job.
+
+        :param job_request_book_and_confirm_request: Quick booking (required)
+        :type job_request_book_and_confirm_request: JobRequestBookAndConfirmRequest
+        :param idempotency_key: Makes retries safe: a repeat send with the same key returns the original result instead of booking again
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._book_and_confirm_job_request_serialize(
+            job_request_book_and_confirm_request=job_request_book_and_confirm_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "BookAndConfirmJobRequest200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '422': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _book_and_confirm_job_request_serialize(
+        self,
+        job_request_book_and_confirm_request,
+        idempotency_key,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        # process the header parameters
+        if idempotency_key is not None:
+            _header_params['Idempotency-Key'] = idempotency_key
+        # process the form parameters
+        # process the body parameter
+        if job_request_book_and_confirm_request is not None:
+            _body_params = job_request_book_and_confirm_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/job-requests/quick',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def commit_absence_resolve(
+        self,
+        job_request_absence_commit_request: Annotated[JobRequestAbsenceCommitRequest, Field(description="preview scope + the previewed assignments to apply")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> CommitAbsenceResolve200Response:
+        """Commit the previewed re-staffing of a technician's day
+
+        Applies the plan returned by /absence/preview, ATOMICALLY: every assignment in one transaction (all or nothing), each job re-staffed onto its alternate at its unchanged window, its \"needs attention\" flag cleared, its status_version bumped. Commit VERIFIES and never re-solves — send `assignments[]` copied from `preview.resolved[]` (you may drop rows, never add or re-point them) and, to ACCEPT a priced alternative from `preview.unresolved[].alternatives[]`, the same row plus its `alternative_kind` and (for a reschedule kind) its `start_at`/`end_at`; the engine re-checks that technician at that window under exactly that relaxation. A reschedule kind rewrites `scheduled_at`, notifies the customer of the NEW TIME (`job_rescheduled`, never `tech_reassigned` on top) and fires `job_request.rescheduled`; the response row then carries `alternative_kind`, `cost`, `original_start_at`/`original_end_at` and `window_preserved: false`. Requires a time-off record covering EVERY day of the range for the technician (pending or approved); a pending one is APPROVED by the commit, because the engine's feasibility filter reads approved time-off only and without it the absent technician stays bookable everywhere else. The response mirrors the preview plus per-job `notification` evidence (dispatched | skipped + reason — what the routing WILL do, never proof of delivery), `attention_cleared`, and `time_off`. Supports Idempotency-Key. Requires job_manage AND schedule_manage (the approval is a scheduling action). See ABSENCE_RESOLVE_DESIGN.md. 409 NEXT STEPS: ABSENCE_RESOLVE_TIME_OFF_REQUIRED — the absence is not recorded well enough to commit against: `data.uncovered_dates[]` (days no eligible record touches) and `data.uncovered_jobs[]` (jobs no single eligible record spans); eligible = approved records, plus PENDING records whose span lies INSIDE the range — a pending record WIDER than the range (somebody's leave request) is never approved by this commit and is listed in `data.pending_wider_time_off_ids[]` for a human to decide. Record a sick-day time-off via `data.create_via` (POST /business/technician-time-off, pending is enough), then commit again. ABSENCE_RESOLVE_PLAN_DRIFTED — the world moved since the preview; `data.drifted[]` names the job (job_id/short_code/expected_version) and `reason` says how: `version` (the row changed or left the technician's lane), `infeasible` (the alternate can no longer take it), `occupied` (the alternate's lane overlapped after the write). No job was written; `data.time_offs[]` lists any pending record the commit had already approved — re-preview, show the new plan, commit again. ABSENCE_RESOLVE_NO_ORPHANED_JOBS — the board is empty for the range.
+
+        :param job_request_absence_commit_request: preview scope + the previewed assignments to apply (required)
+        :type job_request_absence_commit_request: JobRequestAbsenceCommitRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._commit_absence_resolve_serialize(
+            job_request_absence_commit_request=job_request_absence_commit_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CommitAbsenceResolve200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def commit_absence_resolve_with_http_info(
+        self,
+        job_request_absence_commit_request: Annotated[JobRequestAbsenceCommitRequest, Field(description="preview scope + the previewed assignments to apply")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[CommitAbsenceResolve200Response]:
+        """Commit the previewed re-staffing of a technician's day
+
+        Applies the plan returned by /absence/preview, ATOMICALLY: every assignment in one transaction (all or nothing), each job re-staffed onto its alternate at its unchanged window, its \"needs attention\" flag cleared, its status_version bumped. Commit VERIFIES and never re-solves — send `assignments[]` copied from `preview.resolved[]` (you may drop rows, never add or re-point them) and, to ACCEPT a priced alternative from `preview.unresolved[].alternatives[]`, the same row plus its `alternative_kind` and (for a reschedule kind) its `start_at`/`end_at`; the engine re-checks that technician at that window under exactly that relaxation. A reschedule kind rewrites `scheduled_at`, notifies the customer of the NEW TIME (`job_rescheduled`, never `tech_reassigned` on top) and fires `job_request.rescheduled`; the response row then carries `alternative_kind`, `cost`, `original_start_at`/`original_end_at` and `window_preserved: false`. Requires a time-off record covering EVERY day of the range for the technician (pending or approved); a pending one is APPROVED by the commit, because the engine's feasibility filter reads approved time-off only and without it the absent technician stays bookable everywhere else. The response mirrors the preview plus per-job `notification` evidence (dispatched | skipped + reason — what the routing WILL do, never proof of delivery), `attention_cleared`, and `time_off`. Supports Idempotency-Key. Requires job_manage AND schedule_manage (the approval is a scheduling action). See ABSENCE_RESOLVE_DESIGN.md. 409 NEXT STEPS: ABSENCE_RESOLVE_TIME_OFF_REQUIRED — the absence is not recorded well enough to commit against: `data.uncovered_dates[]` (days no eligible record touches) and `data.uncovered_jobs[]` (jobs no single eligible record spans); eligible = approved records, plus PENDING records whose span lies INSIDE the range — a pending record WIDER than the range (somebody's leave request) is never approved by this commit and is listed in `data.pending_wider_time_off_ids[]` for a human to decide. Record a sick-day time-off via `data.create_via` (POST /business/technician-time-off, pending is enough), then commit again. ABSENCE_RESOLVE_PLAN_DRIFTED — the world moved since the preview; `data.drifted[]` names the job (job_id/short_code/expected_version) and `reason` says how: `version` (the row changed or left the technician's lane), `infeasible` (the alternate can no longer take it), `occupied` (the alternate's lane overlapped after the write). No job was written; `data.time_offs[]` lists any pending record the commit had already approved — re-preview, show the new plan, commit again. ABSENCE_RESOLVE_NO_ORPHANED_JOBS — the board is empty for the range.
+
+        :param job_request_absence_commit_request: preview scope + the previewed assignments to apply (required)
+        :type job_request_absence_commit_request: JobRequestAbsenceCommitRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._commit_absence_resolve_serialize(
+            job_request_absence_commit_request=job_request_absence_commit_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CommitAbsenceResolve200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def commit_absence_resolve_without_preload_content(
+        self,
+        job_request_absence_commit_request: Annotated[JobRequestAbsenceCommitRequest, Field(description="preview scope + the previewed assignments to apply")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Commit the previewed re-staffing of a technician's day
+
+        Applies the plan returned by /absence/preview, ATOMICALLY: every assignment in one transaction (all or nothing), each job re-staffed onto its alternate at its unchanged window, its \"needs attention\" flag cleared, its status_version bumped. Commit VERIFIES and never re-solves — send `assignments[]` copied from `preview.resolved[]` (you may drop rows, never add or re-point them) and, to ACCEPT a priced alternative from `preview.unresolved[].alternatives[]`, the same row plus its `alternative_kind` and (for a reschedule kind) its `start_at`/`end_at`; the engine re-checks that technician at that window under exactly that relaxation. A reschedule kind rewrites `scheduled_at`, notifies the customer of the NEW TIME (`job_rescheduled`, never `tech_reassigned` on top) and fires `job_request.rescheduled`; the response row then carries `alternative_kind`, `cost`, `original_start_at`/`original_end_at` and `window_preserved: false`. Requires a time-off record covering EVERY day of the range for the technician (pending or approved); a pending one is APPROVED by the commit, because the engine's feasibility filter reads approved time-off only and without it the absent technician stays bookable everywhere else. The response mirrors the preview plus per-job `notification` evidence (dispatched | skipped + reason — what the routing WILL do, never proof of delivery), `attention_cleared`, and `time_off`. Supports Idempotency-Key. Requires job_manage AND schedule_manage (the approval is a scheduling action). See ABSENCE_RESOLVE_DESIGN.md. 409 NEXT STEPS: ABSENCE_RESOLVE_TIME_OFF_REQUIRED — the absence is not recorded well enough to commit against: `data.uncovered_dates[]` (days no eligible record touches) and `data.uncovered_jobs[]` (jobs no single eligible record spans); eligible = approved records, plus PENDING records whose span lies INSIDE the range — a pending record WIDER than the range (somebody's leave request) is never approved by this commit and is listed in `data.pending_wider_time_off_ids[]` for a human to decide. Record a sick-day time-off via `data.create_via` (POST /business/technician-time-off, pending is enough), then commit again. ABSENCE_RESOLVE_PLAN_DRIFTED — the world moved since the preview; `data.drifted[]` names the job (job_id/short_code/expected_version) and `reason` says how: `version` (the row changed or left the technician's lane), `infeasible` (the alternate can no longer take it), `occupied` (the alternate's lane overlapped after the write). No job was written; `data.time_offs[]` lists any pending record the commit had already approved — re-preview, show the new plan, commit again. ABSENCE_RESOLVE_NO_ORPHANED_JOBS — the board is empty for the range.
+
+        :param job_request_absence_commit_request: preview scope + the previewed assignments to apply (required)
+        :type job_request_absence_commit_request: JobRequestAbsenceCommitRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._commit_absence_resolve_serialize(
+            job_request_absence_commit_request=job_request_absence_commit_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CommitAbsenceResolve200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _commit_absence_resolve_serialize(
+        self,
+        job_request_absence_commit_request,
+        idempotency_key,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        # process the header parameters
+        if idempotency_key is not None:
+            _header_params['Idempotency-Key'] = idempotency_key
+        # process the form parameters
+        # process the body parameter
+        if job_request_absence_commit_request is not None:
+            _body_params = job_request_absence_commit_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/job-requests/absence/commit',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
     def commit_emergency_reschedule(
         self,
         job_request_emergency_commit_request: Annotated[JobRequestEmergencyCommitRequest, Field(description="emergency insert spec")],
@@ -81,7 +703,7 @@ class JobRequestBusinessApi:
     ) -> CommitEmergencyReschedule200Response:
         """Commit emergency insert + cascade reschedule
 
-        Applies the cascade previewed by /emergency/preview: assigns the emergency job to the technician and pushes the displaced jobs back (or, with `displacement_mode=reassign`, re-staffs them onto their previewed alternates first), atomically. Supports Idempotency-Key. The server recomputes the plan under a lock and fences each job on its status_version — if anything changed since the preview it returns 409 EMERGENCY_RESCHEDULE_PLAN_DRIFTED (re-preview). Same body as preview + optional `emergency_expected_version`. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_PLAN_DRIFTED — the schedule changed between your preview and this commit (another booking/move won a lane): call /preview again, show the fresh plan, then commit. EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — landing window blocked by an immovable anchor (P0/crew/multi-day): another tech or time. Other codes — same remedies as /candidates.
+        Applies the cascade previewed by /emergency/preview: assigns the emergency job to the technician and pushes the displaced jobs back (or, with `displacement_mode=reassign`, re-staffs them onto their previewed alternates first), atomically. Supports Idempotency-Key. The server recomputes the plan under a lock and fences each job on its status_version — if anything changed since the preview it returns 409 EMERGENCY_RESCHEDULE_PLAN_DRIFTED (re-preview). Same body as preview + optional `emergency_expected_version`. `after_hours_override=true` must match the preview it followed — it drops the non-working-day rejection (this endpoint never runs the technician's working-hours/time-off feasibility check; that only happens on /candidates), and the response carries an AFTER_HOURS warning; the committed job's activity feed also records who authorized the after-hours placement. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_PLAN_DRIFTED — the schedule changed between your preview and this commit (another booking/move won a lane); `data.drifted[]` names the job(s) whose status_version moved when the fence can attribute it (absent, never empty, when only a length mismatch is known): call /preview again, show the fresh plan, then commit. EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — landing window blocked by an immovable anchor (P0/crew/multi-day); `data.conflicts[]` names it: another tech or time. Other codes — same remedies and `data` shapes as /candidates. EMERGENCY_RESCHEDULE_NO_WORKING_DAY does NOT fire when after_hours_override=true.
 
         :param job_request_emergency_commit_request: emergency insert spec (required)
         :type job_request_emergency_commit_request: JobRequestEmergencyCommitRequest
@@ -158,7 +780,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[CommitEmergencyReschedule200Response]:
         """Commit emergency insert + cascade reschedule
 
-        Applies the cascade previewed by /emergency/preview: assigns the emergency job to the technician and pushes the displaced jobs back (or, with `displacement_mode=reassign`, re-staffs them onto their previewed alternates first), atomically. Supports Idempotency-Key. The server recomputes the plan under a lock and fences each job on its status_version — if anything changed since the preview it returns 409 EMERGENCY_RESCHEDULE_PLAN_DRIFTED (re-preview). Same body as preview + optional `emergency_expected_version`. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_PLAN_DRIFTED — the schedule changed between your preview and this commit (another booking/move won a lane): call /preview again, show the fresh plan, then commit. EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — landing window blocked by an immovable anchor (P0/crew/multi-day): another tech or time. Other codes — same remedies as /candidates.
+        Applies the cascade previewed by /emergency/preview: assigns the emergency job to the technician and pushes the displaced jobs back (or, with `displacement_mode=reassign`, re-staffs them onto their previewed alternates first), atomically. Supports Idempotency-Key. The server recomputes the plan under a lock and fences each job on its status_version — if anything changed since the preview it returns 409 EMERGENCY_RESCHEDULE_PLAN_DRIFTED (re-preview). Same body as preview + optional `emergency_expected_version`. `after_hours_override=true` must match the preview it followed — it drops the non-working-day rejection (this endpoint never runs the technician's working-hours/time-off feasibility check; that only happens on /candidates), and the response carries an AFTER_HOURS warning; the committed job's activity feed also records who authorized the after-hours placement. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_PLAN_DRIFTED — the schedule changed between your preview and this commit (another booking/move won a lane); `data.drifted[]` names the job(s) whose status_version moved when the fence can attribute it (absent, never empty, when only a length mismatch is known): call /preview again, show the fresh plan, then commit. EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — landing window blocked by an immovable anchor (P0/crew/multi-day); `data.conflicts[]` names it: another tech or time. Other codes — same remedies and `data` shapes as /candidates. EMERGENCY_RESCHEDULE_NO_WORKING_DAY does NOT fire when after_hours_override=true.
 
         :param job_request_emergency_commit_request: emergency insert spec (required)
         :type job_request_emergency_commit_request: JobRequestEmergencyCommitRequest
@@ -235,7 +857,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Commit emergency insert + cascade reschedule
 
-        Applies the cascade previewed by /emergency/preview: assigns the emergency job to the technician and pushes the displaced jobs back (or, with `displacement_mode=reassign`, re-staffs them onto their previewed alternates first), atomically. Supports Idempotency-Key. The server recomputes the plan under a lock and fences each job on its status_version — if anything changed since the preview it returns 409 EMERGENCY_RESCHEDULE_PLAN_DRIFTED (re-preview). Same body as preview + optional `emergency_expected_version`. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_PLAN_DRIFTED — the schedule changed between your preview and this commit (another booking/move won a lane): call /preview again, show the fresh plan, then commit. EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — landing window blocked by an immovable anchor (P0/crew/multi-day): another tech or time. Other codes — same remedies as /candidates.
+        Applies the cascade previewed by /emergency/preview: assigns the emergency job to the technician and pushes the displaced jobs back (or, with `displacement_mode=reassign`, re-staffs them onto their previewed alternates first), atomically. Supports Idempotency-Key. The server recomputes the plan under a lock and fences each job on its status_version — if anything changed since the preview it returns 409 EMERGENCY_RESCHEDULE_PLAN_DRIFTED (re-preview). Same body as preview + optional `emergency_expected_version`. `after_hours_override=true` must match the preview it followed — it drops the non-working-day rejection (this endpoint never runs the technician's working-hours/time-off feasibility check; that only happens on /candidates), and the response carries an AFTER_HOURS warning; the committed job's activity feed also records who authorized the after-hours placement. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_PLAN_DRIFTED — the schedule changed between your preview and this commit (another booking/move won a lane); `data.drifted[]` names the job(s) whose status_version moved when the fence can attribute it (absent, never empty, when only a length mismatch is known): call /preview again, show the fresh plan, then commit. EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — landing window blocked by an immovable anchor (P0/crew/multi-day); `data.conflicts[]` names it: another tech or time. Other codes — same remedies and `data` shapes as /candidates. EMERGENCY_RESCHEDULE_NO_WORKING_DAY does NOT fire when after_hours_override=true.
 
         :param job_request_emergency_commit_request: emergency insert spec (required)
         :type job_request_emergency_commit_request: JobRequestEmergencyCommitRequest
@@ -389,7 +1011,7 @@ class JobRequestBusinessApi:
     ) -> CommitJobRequestMove200Response:
         """Commit a schedule-board job move
 
-        Applies the move previewed by /move/preview: places the job on the technician at the new time and pushes the displaced jobs back, atomically (per-tech advisory lock; the server recomputes the plan and fences each job on its status_version — drift since the preview returns 409 SCHEDULE_MOVE_PLAN_DRIFTED, re-preview). Same body as preview + optional `expected_version`. See SCHEDULE_BOARD_DESIGN.md. 409 NEXT STEPS: SCHEDULE_MOVE_PLAN_DRIFTED — the schedule changed since your preview (or expected_move_ids no longer match): re-preview, show the fresh plan, commit again. All other codes — same remedies as /move/preview.
+        Applies the move previewed by /move/preview: places the job on the technician at the new time and pushes the displaced jobs back, atomically (per-tech advisory lock; the server recomputes the plan and fences each job on its status_version — drift since the preview returns 409 SCHEDULE_MOVE_PLAN_DRIFTED, re-preview). Same body as preview + optional `expected_version`. See SCHEDULE_BOARD_DESIGN.md. 409 NEXT STEPS: SCHEDULE_MOVE_PLAN_DRIFTED — the schedule changed since your preview (or expected_move_ids/expected_member_ids no longer match): re-preview, show the fresh plan, commit again; carries no further `data` (the fence cannot attribute the drift to one specific job). All other codes — same remedies AND `data` shapes as /move/preview.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -470,7 +1092,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[CommitJobRequestMove200Response]:
         """Commit a schedule-board job move
 
-        Applies the move previewed by /move/preview: places the job on the technician at the new time and pushes the displaced jobs back, atomically (per-tech advisory lock; the server recomputes the plan and fences each job on its status_version — drift since the preview returns 409 SCHEDULE_MOVE_PLAN_DRIFTED, re-preview). Same body as preview + optional `expected_version`. See SCHEDULE_BOARD_DESIGN.md. 409 NEXT STEPS: SCHEDULE_MOVE_PLAN_DRIFTED — the schedule changed since your preview (or expected_move_ids no longer match): re-preview, show the fresh plan, commit again. All other codes — same remedies as /move/preview.
+        Applies the move previewed by /move/preview: places the job on the technician at the new time and pushes the displaced jobs back, atomically (per-tech advisory lock; the server recomputes the plan and fences each job on its status_version — drift since the preview returns 409 SCHEDULE_MOVE_PLAN_DRIFTED, re-preview). Same body as preview + optional `expected_version`. See SCHEDULE_BOARD_DESIGN.md. 409 NEXT STEPS: SCHEDULE_MOVE_PLAN_DRIFTED — the schedule changed since your preview (or expected_move_ids/expected_member_ids no longer match): re-preview, show the fresh plan, commit again; carries no further `data` (the fence cannot attribute the drift to one specific job). All other codes — same remedies AND `data` shapes as /move/preview.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -551,7 +1173,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Commit a schedule-board job move
 
-        Applies the move previewed by /move/preview: places the job on the technician at the new time and pushes the displaced jobs back, atomically (per-tech advisory lock; the server recomputes the plan and fences each job on its status_version — drift since the preview returns 409 SCHEDULE_MOVE_PLAN_DRIFTED, re-preview). Same body as preview + optional `expected_version`. See SCHEDULE_BOARD_DESIGN.md. 409 NEXT STEPS: SCHEDULE_MOVE_PLAN_DRIFTED — the schedule changed since your preview (or expected_move_ids no longer match): re-preview, show the fresh plan, commit again. All other codes — same remedies as /move/preview.
+        Applies the move previewed by /move/preview: places the job on the technician at the new time and pushes the displaced jobs back, atomically (per-tech advisory lock; the server recomputes the plan and fences each job on its status_version — drift since the preview returns 409 SCHEDULE_MOVE_PLAN_DRIFTED, re-preview). Same body as preview + optional `expected_version`. See SCHEDULE_BOARD_DESIGN.md. 409 NEXT STEPS: SCHEDULE_MOVE_PLAN_DRIFTED — the schedule changed since your preview (or expected_move_ids/expected_member_ids no longer match): re-preview, show the fresh plan, commit again; carries no further `data` (the fence cannot attribute the drift to one specific job). All other codes — same remedies AND `data` shapes as /move/preview.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -711,7 +1333,7 @@ class JobRequestBusinessApi:
     ) -> ResponseEnvelope:
         """Confirm a booking on behalf of the customer
 
-        Fires the customer-actor `confirm_booking` action from the BUSINESS surface (audited as business_on_behalf). Two uses: (1) LIVE — staff confirm a slot for a customer who booked by phone; (2) SANDBOX — the customer magic-token surface is live-only (a sandbox job's link can never reach a real customer), so this is the ONLY way to drive a sandbox test job past booking (book → quote → confirm → assign → complete). Body carries the customer-chosen scheduled_at (business-local naive datetime). DECISION TABLE — every 409 this endpoint returns, and the correct NEXT STEP (branch on error_code, never on the HTTP status): • JOB_REQUEST_STAGE_CONFLICT — the job changed since you read it (NOTE: every FAILED confirm attempt also bumps status_version by design). Next: re-GET the job, retry with the fresh status_version. • JOB_REQUEST_ACTION_NOT_PENDING — the job is no longer at the confirm step (usually: already confirmed). Next: re-GET and show current status; do not retry. • JOB_REQUEST_NO_TECHNICIAN_AVAILABLE — the TIME is infeasible for everyone (outside working hours / the customer window, or nobody qualifies). Next: pick another time via booking-windows / time-segments. NOT an emergency case — displacement cannot conjure capacity. • JOB_REQUEST_TECH_INFEASIBLE — the FORCED technician can never take the job then; `data.reason` says why: cannot_arrive_in_time (commute/shift-start — `data.earliest_feasible_at` (RFC3339 UTC) is the first same-day time they CAN be on site → offer it) | missing_required_skills | not_available_today | not_lead_tier. Next: keep the tech and reschedule to earliest_feasible_at+, OR keep the time and drop technician_id (auto-pick) / choose another tech from time-segments. NOT an emergency case. • JOB_REQUEST_P0_REQUIRES_DISPLACEMENT — the ONLY code that routes to the EMERGENCY flow: the job is P0, the tech qualifies, but the lane is genuinely occupied. Next: POST emergency/candidates → preview → commit (the commit auto-confirms). Caveat: if the occupying jobs are themselves P0 the preview will reject with EMERGENCY_RESCHEDULE_SLOT_OCCUPIED (P0 never displaces P0) — then pick another tech/time.
+        Fires the customer-actor `confirm_booking` action from the BUSINESS surface (audited as business_on_behalf). Two uses: (1) LIVE — staff confirm a slot for a customer who booked by phone; (2) SANDBOX — the customer magic-token surface is live-only (a sandbox job's link can never reach a real customer), so this is the ONLY way to drive a sandbox test job past booking (book → quote → confirm → assign → complete). Body carries the customer-chosen scheduled_at (business-local naive datetime). DECISION TABLE — every 409 this endpoint returns, and the correct NEXT STEP (branch on error_code, never on the HTTP status): • JOB_REQUEST_STAGE_CONFLICT — the job changed since you read it (NOTE: every FAILED confirm attempt also bumps status_version by design). Next: re-GET the job, retry with the fresh status_version. • JOB_REQUEST_ACTION_NOT_PENDING — the job is no longer at the confirm step (usually: already confirmed). Next: re-GET and show current status; do not retry. • JOB_REQUEST_NO_TECHNICIAN_AVAILABLE — the TIME is infeasible for everyone (outside working hours / the customer window, or nobody qualifies). Best-effort `data` breakdown: `considered` (roster size checked), `blocked_by` (histogram of blockers[0].kind → count, only kinds that actually blocked someone), `truncated` (roster larger than the check covered). Next: pick another time via booking-windows / time-segments. NOT an emergency case — displacement cannot conjure capacity. • JOB_REQUEST_TECH_INFEASIBLE — the FORCED technician can never take the job then; `data.reason` says why (blockers[0].kind): outside_service_area | missing_required_skills | not_lead_tier | no_working_day | on_time_off | off_shift | visit_too_long | cannot_arrive_in_time (see `data.earliest_feasible_at`, RFC3339 UTC — the first same-day time they CAN be on site → offer it) | not_available_today (diagnosis unavailable). `data.blockers[]` names EVERY cause, most-structural first (`data.technician` carries an id; `name` is always empty on this confirm path today — nothing here calls the name lookup move's TECH_NOT_FEASIBLE payload uses); a UI that reads only `reason` still works. Next: keep the tech and reschedule to earliest_feasible_at+, OR keep the time and drop technician_id (auto-pick) / choose another tech from time-segments. NOT an emergency case. • JOB_REQUEST_P0_REQUIRES_DISPLACEMENT — the ONLY code that routes to the EMERGENCY flow: the job is P0, the tech qualifies, but the lane is genuinely occupied. Next: POST emergency/candidates → preview → commit (the commit auto-confirms). Caveat: if the occupying jobs are themselves P0 the preview will reject with EMERGENCY_RESCHEDULE_SLOT_OCCUPIED (P0 never displaces P0) — then pick another tech/time.
 
         :param id: Job request ID (required)
         :type id: str
@@ -755,6 +1377,7 @@ class JobRequestBusinessApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -791,7 +1414,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[ResponseEnvelope]:
         """Confirm a booking on behalf of the customer
 
-        Fires the customer-actor `confirm_booking` action from the BUSINESS surface (audited as business_on_behalf). Two uses: (1) LIVE — staff confirm a slot for a customer who booked by phone; (2) SANDBOX — the customer magic-token surface is live-only (a sandbox job's link can never reach a real customer), so this is the ONLY way to drive a sandbox test job past booking (book → quote → confirm → assign → complete). Body carries the customer-chosen scheduled_at (business-local naive datetime). DECISION TABLE — every 409 this endpoint returns, and the correct NEXT STEP (branch on error_code, never on the HTTP status): • JOB_REQUEST_STAGE_CONFLICT — the job changed since you read it (NOTE: every FAILED confirm attempt also bumps status_version by design). Next: re-GET the job, retry with the fresh status_version. • JOB_REQUEST_ACTION_NOT_PENDING — the job is no longer at the confirm step (usually: already confirmed). Next: re-GET and show current status; do not retry. • JOB_REQUEST_NO_TECHNICIAN_AVAILABLE — the TIME is infeasible for everyone (outside working hours / the customer window, or nobody qualifies). Next: pick another time via booking-windows / time-segments. NOT an emergency case — displacement cannot conjure capacity. • JOB_REQUEST_TECH_INFEASIBLE — the FORCED technician can never take the job then; `data.reason` says why: cannot_arrive_in_time (commute/shift-start — `data.earliest_feasible_at` (RFC3339 UTC) is the first same-day time they CAN be on site → offer it) | missing_required_skills | not_available_today | not_lead_tier. Next: keep the tech and reschedule to earliest_feasible_at+, OR keep the time and drop technician_id (auto-pick) / choose another tech from time-segments. NOT an emergency case. • JOB_REQUEST_P0_REQUIRES_DISPLACEMENT — the ONLY code that routes to the EMERGENCY flow: the job is P0, the tech qualifies, but the lane is genuinely occupied. Next: POST emergency/candidates → preview → commit (the commit auto-confirms). Caveat: if the occupying jobs are themselves P0 the preview will reject with EMERGENCY_RESCHEDULE_SLOT_OCCUPIED (P0 never displaces P0) — then pick another tech/time.
+        Fires the customer-actor `confirm_booking` action from the BUSINESS surface (audited as business_on_behalf). Two uses: (1) LIVE — staff confirm a slot for a customer who booked by phone; (2) SANDBOX — the customer magic-token surface is live-only (a sandbox job's link can never reach a real customer), so this is the ONLY way to drive a sandbox test job past booking (book → quote → confirm → assign → complete). Body carries the customer-chosen scheduled_at (business-local naive datetime). DECISION TABLE — every 409 this endpoint returns, and the correct NEXT STEP (branch on error_code, never on the HTTP status): • JOB_REQUEST_STAGE_CONFLICT — the job changed since you read it (NOTE: every FAILED confirm attempt also bumps status_version by design). Next: re-GET the job, retry with the fresh status_version. • JOB_REQUEST_ACTION_NOT_PENDING — the job is no longer at the confirm step (usually: already confirmed). Next: re-GET and show current status; do not retry. • JOB_REQUEST_NO_TECHNICIAN_AVAILABLE — the TIME is infeasible for everyone (outside working hours / the customer window, or nobody qualifies). Best-effort `data` breakdown: `considered` (roster size checked), `blocked_by` (histogram of blockers[0].kind → count, only kinds that actually blocked someone), `truncated` (roster larger than the check covered). Next: pick another time via booking-windows / time-segments. NOT an emergency case — displacement cannot conjure capacity. • JOB_REQUEST_TECH_INFEASIBLE — the FORCED technician can never take the job then; `data.reason` says why (blockers[0].kind): outside_service_area | missing_required_skills | not_lead_tier | no_working_day | on_time_off | off_shift | visit_too_long | cannot_arrive_in_time (see `data.earliest_feasible_at`, RFC3339 UTC — the first same-day time they CAN be on site → offer it) | not_available_today (diagnosis unavailable). `data.blockers[]` names EVERY cause, most-structural first (`data.technician` carries an id; `name` is always empty on this confirm path today — nothing here calls the name lookup move's TECH_NOT_FEASIBLE payload uses); a UI that reads only `reason` still works. Next: keep the tech and reschedule to earliest_feasible_at+, OR keep the time and drop technician_id (auto-pick) / choose another tech from time-segments. NOT an emergency case. • JOB_REQUEST_P0_REQUIRES_DISPLACEMENT — the ONLY code that routes to the EMERGENCY flow: the job is P0, the tech qualifies, but the lane is genuinely occupied. Next: POST emergency/candidates → preview → commit (the commit auto-confirms). Caveat: if the occupying jobs are themselves P0 the preview will reject with EMERGENCY_RESCHEDULE_SLOT_OCCUPIED (P0 never displaces P0) — then pick another tech/time.
 
         :param id: Job request ID (required)
         :type id: str
@@ -835,6 +1458,7 @@ class JobRequestBusinessApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -871,7 +1495,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Confirm a booking on behalf of the customer
 
-        Fires the customer-actor `confirm_booking` action from the BUSINESS surface (audited as business_on_behalf). Two uses: (1) LIVE — staff confirm a slot for a customer who booked by phone; (2) SANDBOX — the customer magic-token surface is live-only (a sandbox job's link can never reach a real customer), so this is the ONLY way to drive a sandbox test job past booking (book → quote → confirm → assign → complete). Body carries the customer-chosen scheduled_at (business-local naive datetime). DECISION TABLE — every 409 this endpoint returns, and the correct NEXT STEP (branch on error_code, never on the HTTP status): • JOB_REQUEST_STAGE_CONFLICT — the job changed since you read it (NOTE: every FAILED confirm attempt also bumps status_version by design). Next: re-GET the job, retry with the fresh status_version. • JOB_REQUEST_ACTION_NOT_PENDING — the job is no longer at the confirm step (usually: already confirmed). Next: re-GET and show current status; do not retry. • JOB_REQUEST_NO_TECHNICIAN_AVAILABLE — the TIME is infeasible for everyone (outside working hours / the customer window, or nobody qualifies). Next: pick another time via booking-windows / time-segments. NOT an emergency case — displacement cannot conjure capacity. • JOB_REQUEST_TECH_INFEASIBLE — the FORCED technician can never take the job then; `data.reason` says why: cannot_arrive_in_time (commute/shift-start — `data.earliest_feasible_at` (RFC3339 UTC) is the first same-day time they CAN be on site → offer it) | missing_required_skills | not_available_today | not_lead_tier. Next: keep the tech and reschedule to earliest_feasible_at+, OR keep the time and drop technician_id (auto-pick) / choose another tech from time-segments. NOT an emergency case. • JOB_REQUEST_P0_REQUIRES_DISPLACEMENT — the ONLY code that routes to the EMERGENCY flow: the job is P0, the tech qualifies, but the lane is genuinely occupied. Next: POST emergency/candidates → preview → commit (the commit auto-confirms). Caveat: if the occupying jobs are themselves P0 the preview will reject with EMERGENCY_RESCHEDULE_SLOT_OCCUPIED (P0 never displaces P0) — then pick another tech/time.
+        Fires the customer-actor `confirm_booking` action from the BUSINESS surface (audited as business_on_behalf). Two uses: (1) LIVE — staff confirm a slot for a customer who booked by phone; (2) SANDBOX — the customer magic-token surface is live-only (a sandbox job's link can never reach a real customer), so this is the ONLY way to drive a sandbox test job past booking (book → quote → confirm → assign → complete). Body carries the customer-chosen scheduled_at (business-local naive datetime). DECISION TABLE — every 409 this endpoint returns, and the correct NEXT STEP (branch on error_code, never on the HTTP status): • JOB_REQUEST_STAGE_CONFLICT — the job changed since you read it (NOTE: every FAILED confirm attempt also bumps status_version by design). Next: re-GET the job, retry with the fresh status_version. • JOB_REQUEST_ACTION_NOT_PENDING — the job is no longer at the confirm step (usually: already confirmed). Next: re-GET and show current status; do not retry. • JOB_REQUEST_NO_TECHNICIAN_AVAILABLE — the TIME is infeasible for everyone (outside working hours / the customer window, or nobody qualifies). Best-effort `data` breakdown: `considered` (roster size checked), `blocked_by` (histogram of blockers[0].kind → count, only kinds that actually blocked someone), `truncated` (roster larger than the check covered). Next: pick another time via booking-windows / time-segments. NOT an emergency case — displacement cannot conjure capacity. • JOB_REQUEST_TECH_INFEASIBLE — the FORCED technician can never take the job then; `data.reason` says why (blockers[0].kind): outside_service_area | missing_required_skills | not_lead_tier | no_working_day | on_time_off | off_shift | visit_too_long | cannot_arrive_in_time (see `data.earliest_feasible_at`, RFC3339 UTC — the first same-day time they CAN be on site → offer it) | not_available_today (diagnosis unavailable). `data.blockers[]` names EVERY cause, most-structural first (`data.technician` carries an id; `name` is always empty on this confirm path today — nothing here calls the name lookup move's TECH_NOT_FEASIBLE payload uses); a UI that reads only `reason` still works. Next: keep the tech and reschedule to earliest_feasible_at+, OR keep the time and drop technician_id (auto-pick) / choose another tech from time-segments. NOT an emergency case. • JOB_REQUEST_P0_REQUIRES_DISPLACEMENT — the ONLY code that routes to the EMERGENCY flow: the job is P0, the tech qualifies, but the lane is genuinely occupied. Next: POST emergency/candidates → preview → commit (the commit auto-confirms). Caveat: if the occupying jobs are themselves P0 the preview will reject with EMERGENCY_RESCHEDULE_SLOT_OCCUPIED (P0 never displaces P0) — then pick another tech/time.
 
         :param id: Job request ID (required)
         :type id: str
@@ -915,6 +1539,7 @@ class JobRequestBusinessApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -1030,7 +1655,7 @@ class JobRequestBusinessApi:
     ) -> CreateJobRequest200Response:
         """Create a job request
 
-        Books a field-service job — the work order that enters the dispatch & scheduling pipeline. Send the customer's UUID plus requested `job_dates` (date + morning/afternoon/evening periods, ideally offered from GET /job-requests/booking-windows), optional `job_type_id` (service catalog), `skill_ids` (required technician qualifications) and a free-text description. Quoting, technician/crew assignment and completion then advance the work order through the business's workflow.
+        Books a field-operations job — the work order that enters the dispatch & scheduling pipeline. Send the customer's UUID plus requested `job_dates` (date + morning/afternoon/evening periods, ideally offered from GET /job-requests/booking-windows), optional `job_type_id` (service catalog), `skill_ids` (required technician qualifications) and a free-text description. Quoting, technician/crew assignment and completion then advance the work order through the business's workflow.
 
         :param job_request_create_request: Booking payload (required)
         :type job_request_create_request: JobRequestCreateRequest
@@ -1074,6 +1699,7 @@ class JobRequestBusinessApi:
             '200': "CreateJobRequest200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '422': "ResponseEnvelope",
@@ -1111,7 +1737,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[CreateJobRequest200Response]:
         """Create a job request
 
-        Books a field-service job — the work order that enters the dispatch & scheduling pipeline. Send the customer's UUID plus requested `job_dates` (date + morning/afternoon/evening periods, ideally offered from GET /job-requests/booking-windows), optional `job_type_id` (service catalog), `skill_ids` (required technician qualifications) and a free-text description. Quoting, technician/crew assignment and completion then advance the work order through the business's workflow.
+        Books a field-operations job — the work order that enters the dispatch & scheduling pipeline. Send the customer's UUID plus requested `job_dates` (date + morning/afternoon/evening periods, ideally offered from GET /job-requests/booking-windows), optional `job_type_id` (service catalog), `skill_ids` (required technician qualifications) and a free-text description. Quoting, technician/crew assignment and completion then advance the work order through the business's workflow.
 
         :param job_request_create_request: Booking payload (required)
         :type job_request_create_request: JobRequestCreateRequest
@@ -1155,6 +1781,7 @@ class JobRequestBusinessApi:
             '200': "CreateJobRequest200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '422': "ResponseEnvelope",
@@ -1192,7 +1819,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Create a job request
 
-        Books a field-service job — the work order that enters the dispatch & scheduling pipeline. Send the customer's UUID plus requested `job_dates` (date + morning/afternoon/evening periods, ideally offered from GET /job-requests/booking-windows), optional `job_type_id` (service catalog), `skill_ids` (required technician qualifications) and a free-text description. Quoting, technician/crew assignment and completion then advance the work order through the business's workflow.
+        Books a field-operations job — the work order that enters the dispatch & scheduling pipeline. Send the customer's UUID plus requested `job_dates` (date + morning/afternoon/evening periods, ideally offered from GET /job-requests/booking-windows), optional `job_type_id` (service catalog), `skill_ids` (required technician qualifications) and a free-text description. Quoting, technician/crew assignment and completion then advance the work order through the business's workflow.
 
         :param job_request_create_request: Booking payload (required)
         :type job_request_create_request: JobRequestCreateRequest
@@ -1236,6 +1863,7 @@ class JobRequestBusinessApi:
             '200': "CreateJobRequest200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '422': "ResponseEnvelope",
@@ -1350,7 +1978,7 @@ class JobRequestBusinessApi:
     ) -> GetJobRequest200Response:
         """Get a job request
 
-        Returns the full work order: current workflow status, quoted duration, confirmed schedule, customer contact snapshot and the assigned technician / crew — everything a dispatcher or an external field-service system needs to track one job.
+        Returns the full work order: current workflow status, quoted duration, confirmed schedule, customer contact snapshot and the assigned technician / crew — everything a dispatcher or an external field-operations system needs to track one job.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -1388,6 +2016,7 @@ class JobRequestBusinessApi:
             '200': "GetJobRequest200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1421,7 +2050,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[GetJobRequest200Response]:
         """Get a job request
 
-        Returns the full work order: current workflow status, quoted duration, confirmed schedule, customer contact snapshot and the assigned technician / crew — everything a dispatcher or an external field-service system needs to track one job.
+        Returns the full work order: current workflow status, quoted duration, confirmed schedule, customer contact snapshot and the assigned technician / crew — everything a dispatcher or an external field-operations system needs to track one job.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -1459,6 +2088,7 @@ class JobRequestBusinessApi:
             '200': "GetJobRequest200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1492,7 +2122,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Get a job request
 
-        Returns the full work order: current workflow status, quoted duration, confirmed schedule, customer contact snapshot and the assigned technician / crew — everything a dispatcher or an external field-service system needs to track one job.
+        Returns the full work order: current workflow status, quoted duration, confirmed schedule, customer contact snapshot and the assigned technician / crew — everything a dispatcher or an external field-operations system needs to track one job.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -1530,6 +2160,7 @@ class JobRequestBusinessApi:
             '200': "GetJobRequest200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1661,6 +2292,7 @@ class JobRequestBusinessApi:
             '200': "GetJobRequestTimeline200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1732,6 +2364,7 @@ class JobRequestBusinessApi:
             '200': "GetJobRequestTimeline200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1803,6 +2436,7 @@ class JobRequestBusinessApi:
             '200': "GetJobRequestTimeline200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1942,6 +2576,7 @@ class JobRequestBusinessApi:
             '200': "GetTechnicianSchedule200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -2021,6 +2656,7 @@ class JobRequestBusinessApi:
             '200': "GetTechnicianSchedule200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -2100,6 +2736,7 @@ class JobRequestBusinessApi:
             '200': "GetTechnicianSchedule200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -2206,7 +2843,7 @@ class JobRequestBusinessApi:
     ) -> ListCrewCandidates200Response:
         """Matching crew candidates for a job
 
-        Technicians who can actually take this job, matched and ranked by the smart-assignment engine — skills per crew slot, weekly availability, existing schedule, time off and travel are all checked; each candidate carries a score breakdown (distance, travel, matched skills) plus the exact on-site session plan they would work. NOT a raw roster list (use GET /technicians for that). Returns the ranked feasible LEAD pool by default; pass include_buddies=true to also return per-slot buddy pools, include_vehicle=true to include the available-vehicle list. force_lead_id checks one specific technician: returns only that lead (with their crew combo) if feasible, else 409 JOB_REQUEST_NO_TECHNICIAN_AVAILABLE.
+        RE-STAFFING candidates for a CONFIRMED, SCHEDULED job (not yet completed/archived) — any earlier or later stage returns 409 JOB_REQUEST_INVALID_TRANSITION. This is the pool of technicians who could REPLACE the current crew: the currently assigned lead and buddies are deliberately excluded (they are the status quo, not an option), so on a small roster an empty `leads` list is a normal answer, not an error. For pre-booking discovery (\"who could take this job before it is confirmed?\") use listJobRequestBookingWindows / listMatchingSlots / the time-segments grid instead. Candidates are matched and ranked by the smart-assignment engine — skills per crew slot, weekly availability, existing schedule, time off and travel are all checked; each carries a score breakdown (distance, travel, matched skills) plus the exact on-site session plan they would work. NOT a raw roster list (use GET /technicians for that). Returns the ranked feasible LEAD pool by default; pass include_buddies=true to also return per-slot buddy pools, include_vehicle=true to include the available-vehicle list. force_lead_id checks one specific technician: returns only that lead (with their crew combo) if feasible, else 409 JOB_REQUEST_NO_TECHNICIAN_AVAILABLE.
 
         :param id: Job request ID or short_code (required)
         :type id: str
@@ -2253,6 +2890,7 @@ class JobRequestBusinessApi:
             '200': "ListCrewCandidates200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -2290,7 +2928,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[ListCrewCandidates200Response]:
         """Matching crew candidates for a job
 
-        Technicians who can actually take this job, matched and ranked by the smart-assignment engine — skills per crew slot, weekly availability, existing schedule, time off and travel are all checked; each candidate carries a score breakdown (distance, travel, matched skills) plus the exact on-site session plan they would work. NOT a raw roster list (use GET /technicians for that). Returns the ranked feasible LEAD pool by default; pass include_buddies=true to also return per-slot buddy pools, include_vehicle=true to include the available-vehicle list. force_lead_id checks one specific technician: returns only that lead (with their crew combo) if feasible, else 409 JOB_REQUEST_NO_TECHNICIAN_AVAILABLE.
+        RE-STAFFING candidates for a CONFIRMED, SCHEDULED job (not yet completed/archived) — any earlier or later stage returns 409 JOB_REQUEST_INVALID_TRANSITION. This is the pool of technicians who could REPLACE the current crew: the currently assigned lead and buddies are deliberately excluded (they are the status quo, not an option), so on a small roster an empty `leads` list is a normal answer, not an error. For pre-booking discovery (\"who could take this job before it is confirmed?\") use listJobRequestBookingWindows / listMatchingSlots / the time-segments grid instead. Candidates are matched and ranked by the smart-assignment engine — skills per crew slot, weekly availability, existing schedule, time off and travel are all checked; each carries a score breakdown (distance, travel, matched skills) plus the exact on-site session plan they would work. NOT a raw roster list (use GET /technicians for that). Returns the ranked feasible LEAD pool by default; pass include_buddies=true to also return per-slot buddy pools, include_vehicle=true to include the available-vehicle list. force_lead_id checks one specific technician: returns only that lead (with their crew combo) if feasible, else 409 JOB_REQUEST_NO_TECHNICIAN_AVAILABLE.
 
         :param id: Job request ID or short_code (required)
         :type id: str
@@ -2337,6 +2975,7 @@ class JobRequestBusinessApi:
             '200': "ListCrewCandidates200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -2374,7 +3013,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Matching crew candidates for a job
 
-        Technicians who can actually take this job, matched and ranked by the smart-assignment engine — skills per crew slot, weekly availability, existing schedule, time off and travel are all checked; each candidate carries a score breakdown (distance, travel, matched skills) plus the exact on-site session plan they would work. NOT a raw roster list (use GET /technicians for that). Returns the ranked feasible LEAD pool by default; pass include_buddies=true to also return per-slot buddy pools, include_vehicle=true to include the available-vehicle list. force_lead_id checks one specific technician: returns only that lead (with their crew combo) if feasible, else 409 JOB_REQUEST_NO_TECHNICIAN_AVAILABLE.
+        RE-STAFFING candidates for a CONFIRMED, SCHEDULED job (not yet completed/archived) — any earlier or later stage returns 409 JOB_REQUEST_INVALID_TRANSITION. This is the pool of technicians who could REPLACE the current crew: the currently assigned lead and buddies are deliberately excluded (they are the status quo, not an option), so on a small roster an empty `leads` list is a normal answer, not an error. For pre-booking discovery (\"who could take this job before it is confirmed?\") use listJobRequestBookingWindows / listMatchingSlots / the time-segments grid instead. Candidates are matched and ranked by the smart-assignment engine — skills per crew slot, weekly availability, existing schedule, time off and travel are all checked; each carries a score breakdown (distance, travel, matched skills) plus the exact on-site session plan they would work. NOT a raw roster list (use GET /technicians for that). Returns the ranked feasible LEAD pool by default; pass include_buddies=true to also return per-slot buddy pools, include_vehicle=true to include the available-vehicle list. force_lead_id checks one specific technician: returns only that lead (with their crew combo) if feasible, else 409 JOB_REQUEST_NO_TECHNICIAN_AVAILABLE.
 
         :param id: Job request ID or short_code (required)
         :type id: str
@@ -2421,6 +3060,7 @@ class JobRequestBusinessApi:
             '200': "ListCrewCandidates200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -2530,7 +3170,7 @@ class JobRequestBusinessApi:
     ) -> ListEmergencyCandidates200Response:
         """Rank technicians for a P0 emergency insert
 
-        Returns the technicians who could take the emergency job at the requested start, ranked FASTEST-ARRIVAL first (arrival beats route efficiency for a P0). The response also carries a historical `crew_recommendation` (median crew size on comparable completed jobs + mandatory disclaimer — AC-2). Booked technicians are still candidates — each entry carries the displacement preview (which lower-priority jobs would be pushed, per day) that committing to them would cause; total_moves=0 means a free slot. P0 jobs are never displaced; P1 only by a P0. ETA is estimated from the technician's start location (no live GPS). Feed the chosen technician_id into emergency/preview + emergency/commit. 409 NEXT STEPS: EMERGENCY_RESCHEDULE_NOT_ELIGIBLE — the job cannot be emergency-inserted (not P0, already started/completed/archived, or not quoted): fix the job state or use a normal confirm. EMERGENCY_RESCHEDULE_CREW_UNSUPPORTED — crew jobs cannot use the emergency flow (v1): staff via confirm/reassign instead. EMERGENCY_RESCHEDULE_MULTIDAY_UNSUPPORTED — a confirmed multi-day job cannot be re-inserted (v1): use the normal reassign flow. EMERGENCY_RESCHEDULE_NO_WORKING_DAY — the chosen date has no working hours: pick a working day. EMERGENCY_RESCHEDULE_IN_PAST — start time already passed: pick a future time.
+        Returns the technicians who could take the emergency job at the requested start, ranked FASTEST-ARRIVAL first (arrival beats route efficiency for a P0). The response also carries a historical `crew_recommendation` (median crew size on comparable completed jobs + mandatory disclaimer — AC-2). Booked technicians are still candidates — each entry carries the displacement preview (which lower-priority jobs would be pushed, per day) that committing to them would cause; total_moves=0 means a free slot. P0 jobs are never displaced; P1 only by a P0. ETA is estimated from the technician's start location (no live GPS). `after_hours_override=true` — the coordinator has phoned the technician — drops the non-working-day rejection AND each candidate's working-hours/time-off feasibility check; an affected candidate carries a per-technician TIME_OFF_OVERLAP warning instead. This is THE phone list for an after-hours insert: it ranks even on a day with no working hours once the flag is set. Feed the chosen technician_id into emergency/preview + emergency/commit. 409 NEXT STEPS: EMERGENCY_RESCHEDULE_NOT_ELIGIBLE — the job cannot be emergency-inserted; `data.failed_precondition` names which (not_quoted | archived | completed | not_p0 | smart_assign_unavailable): fix the job state or use a normal confirm. EMERGENCY_RESCHEDULE_CREW_UNSUPPORTED — crew jobs cannot use the emergency flow (v1, `data.crew_size` = lead + buddies): staff via confirm/reassign instead. EMERGENCY_RESCHEDULE_MULTIDAY_UNSUPPORTED — either a confirmed multi-day job (`data.session_count`/`data.session_dates`; use the normal reassign flow) or a single visit longer than the structural span bound, in which case `data.reason=visit_too_long` + `data.blockers[0]` (visit_minutes/max_minutes) name it — no remedy but a shorter visit. EMERGENCY_RESCHEDULE_NO_WORKING_DAY — the chosen date has no working hours (`data.business_timezone`/`data.requested_weekday`): pick a working day, or set after_hours_override=true (the coordinator has phoned someone) to rank candidates anyway. EMERGENCY_RESCHEDULE_IN_PAST — start time already passed: pick a future time; `data` carries the timezone the naive start_at was read in (`business_timezone`) plus the instant it resolved to, so a start that looks future on the caller's own clock can be diagnosed without guessing.
 
         :param job_request_emergency_candidates_request: Emergency job + desired start (required)
         :type job_request_emergency_candidates_request: JobRequestEmergencyCandidatesRequest
@@ -2603,7 +3243,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[ListEmergencyCandidates200Response]:
         """Rank technicians for a P0 emergency insert
 
-        Returns the technicians who could take the emergency job at the requested start, ranked FASTEST-ARRIVAL first (arrival beats route efficiency for a P0). The response also carries a historical `crew_recommendation` (median crew size on comparable completed jobs + mandatory disclaimer — AC-2). Booked technicians are still candidates — each entry carries the displacement preview (which lower-priority jobs would be pushed, per day) that committing to them would cause; total_moves=0 means a free slot. P0 jobs are never displaced; P1 only by a P0. ETA is estimated from the technician's start location (no live GPS). Feed the chosen technician_id into emergency/preview + emergency/commit. 409 NEXT STEPS: EMERGENCY_RESCHEDULE_NOT_ELIGIBLE — the job cannot be emergency-inserted (not P0, already started/completed/archived, or not quoted): fix the job state or use a normal confirm. EMERGENCY_RESCHEDULE_CREW_UNSUPPORTED — crew jobs cannot use the emergency flow (v1): staff via confirm/reassign instead. EMERGENCY_RESCHEDULE_MULTIDAY_UNSUPPORTED — a confirmed multi-day job cannot be re-inserted (v1): use the normal reassign flow. EMERGENCY_RESCHEDULE_NO_WORKING_DAY — the chosen date has no working hours: pick a working day. EMERGENCY_RESCHEDULE_IN_PAST — start time already passed: pick a future time.
+        Returns the technicians who could take the emergency job at the requested start, ranked FASTEST-ARRIVAL first (arrival beats route efficiency for a P0). The response also carries a historical `crew_recommendation` (median crew size on comparable completed jobs + mandatory disclaimer — AC-2). Booked technicians are still candidates — each entry carries the displacement preview (which lower-priority jobs would be pushed, per day) that committing to them would cause; total_moves=0 means a free slot. P0 jobs are never displaced; P1 only by a P0. ETA is estimated from the technician's start location (no live GPS). `after_hours_override=true` — the coordinator has phoned the technician — drops the non-working-day rejection AND each candidate's working-hours/time-off feasibility check; an affected candidate carries a per-technician TIME_OFF_OVERLAP warning instead. This is THE phone list for an after-hours insert: it ranks even on a day with no working hours once the flag is set. Feed the chosen technician_id into emergency/preview + emergency/commit. 409 NEXT STEPS: EMERGENCY_RESCHEDULE_NOT_ELIGIBLE — the job cannot be emergency-inserted; `data.failed_precondition` names which (not_quoted | archived | completed | not_p0 | smart_assign_unavailable): fix the job state or use a normal confirm. EMERGENCY_RESCHEDULE_CREW_UNSUPPORTED — crew jobs cannot use the emergency flow (v1, `data.crew_size` = lead + buddies): staff via confirm/reassign instead. EMERGENCY_RESCHEDULE_MULTIDAY_UNSUPPORTED — either a confirmed multi-day job (`data.session_count`/`data.session_dates`; use the normal reassign flow) or a single visit longer than the structural span bound, in which case `data.reason=visit_too_long` + `data.blockers[0]` (visit_minutes/max_minutes) name it — no remedy but a shorter visit. EMERGENCY_RESCHEDULE_NO_WORKING_DAY — the chosen date has no working hours (`data.business_timezone`/`data.requested_weekday`): pick a working day, or set after_hours_override=true (the coordinator has phoned someone) to rank candidates anyway. EMERGENCY_RESCHEDULE_IN_PAST — start time already passed: pick a future time; `data` carries the timezone the naive start_at was read in (`business_timezone`) plus the instant it resolved to, so a start that looks future on the caller's own clock can be diagnosed without guessing.
 
         :param job_request_emergency_candidates_request: Emergency job + desired start (required)
         :type job_request_emergency_candidates_request: JobRequestEmergencyCandidatesRequest
@@ -2676,7 +3316,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Rank technicians for a P0 emergency insert
 
-        Returns the technicians who could take the emergency job at the requested start, ranked FASTEST-ARRIVAL first (arrival beats route efficiency for a P0). The response also carries a historical `crew_recommendation` (median crew size on comparable completed jobs + mandatory disclaimer — AC-2). Booked technicians are still candidates — each entry carries the displacement preview (which lower-priority jobs would be pushed, per day) that committing to them would cause; total_moves=0 means a free slot. P0 jobs are never displaced; P1 only by a P0. ETA is estimated from the technician's start location (no live GPS). Feed the chosen technician_id into emergency/preview + emergency/commit. 409 NEXT STEPS: EMERGENCY_RESCHEDULE_NOT_ELIGIBLE — the job cannot be emergency-inserted (not P0, already started/completed/archived, or not quoted): fix the job state or use a normal confirm. EMERGENCY_RESCHEDULE_CREW_UNSUPPORTED — crew jobs cannot use the emergency flow (v1): staff via confirm/reassign instead. EMERGENCY_RESCHEDULE_MULTIDAY_UNSUPPORTED — a confirmed multi-day job cannot be re-inserted (v1): use the normal reassign flow. EMERGENCY_RESCHEDULE_NO_WORKING_DAY — the chosen date has no working hours: pick a working day. EMERGENCY_RESCHEDULE_IN_PAST — start time already passed: pick a future time.
+        Returns the technicians who could take the emergency job at the requested start, ranked FASTEST-ARRIVAL first (arrival beats route efficiency for a P0). The response also carries a historical `crew_recommendation` (median crew size on comparable completed jobs + mandatory disclaimer — AC-2). Booked technicians are still candidates — each entry carries the displacement preview (which lower-priority jobs would be pushed, per day) that committing to them would cause; total_moves=0 means a free slot. P0 jobs are never displaced; P1 only by a P0. ETA is estimated from the technician's start location (no live GPS). `after_hours_override=true` — the coordinator has phoned the technician — drops the non-working-day rejection AND each candidate's working-hours/time-off feasibility check; an affected candidate carries a per-technician TIME_OFF_OVERLAP warning instead. This is THE phone list for an after-hours insert: it ranks even on a day with no working hours once the flag is set. Feed the chosen technician_id into emergency/preview + emergency/commit. 409 NEXT STEPS: EMERGENCY_RESCHEDULE_NOT_ELIGIBLE — the job cannot be emergency-inserted; `data.failed_precondition` names which (not_quoted | archived | completed | not_p0 | smart_assign_unavailable): fix the job state or use a normal confirm. EMERGENCY_RESCHEDULE_CREW_UNSUPPORTED — crew jobs cannot use the emergency flow (v1, `data.crew_size` = lead + buddies): staff via confirm/reassign instead. EMERGENCY_RESCHEDULE_MULTIDAY_UNSUPPORTED — either a confirmed multi-day job (`data.session_count`/`data.session_dates`; use the normal reassign flow) or a single visit longer than the structural span bound, in which case `data.reason=visit_too_long` + `data.blockers[0]` (visit_minutes/max_minutes) name it — no remedy but a shorter visit. EMERGENCY_RESCHEDULE_NO_WORKING_DAY — the chosen date has no working hours (`data.business_timezone`/`data.requested_weekday`): pick a working day, or set after_hours_override=true (the coordinator has phoned someone) to rank candidates anyway. EMERGENCY_RESCHEDULE_IN_PAST — start time already passed: pick a future time; `data` carries the timezone the naive start_at was read in (`business_timezone`) plus the instant it resolved to, so a start that looks future on the caller's own clock can be diagnosed without guessing.
 
         :param job_request_emergency_candidates_request: Emergency job + desired start (required)
         :type job_request_emergency_candidates_request: JobRequestEmergencyCandidatesRequest
@@ -2868,6 +3508,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequestBookingWindows200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -2946,6 +3587,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequestBookingWindows200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -3024,6 +3666,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequestBookingWindows200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -3133,7 +3776,7 @@ class JobRequestBusinessApi:
     ) -> ListJobRequestChanges200Response:
         """Poll for new & changed job requests (sync feed)
 
-        Keep an external system (your CRM, ERP or field-service tool) in sync with bookings WITHOUT re-listing everything: returns the job requests (work orders) whose state changed (created, status transition, reschedule, soft-delete/archive) at or after the `since` cursor, ordered oldest-change-first (updated_at ASC).  How to use it: (1) On your first poll OMIT `since` — the server primes the cursor at \"now\", returns no items and a `next_since`. (2) Store `next_since` and pass it as `since` on the next poll. (3) Apply each returned item to your store by UPSERTING on `id` (the server re-scans a ~5s safety window, so the same job may appear again — never blindly append). (4) If `has_more` is true the page filled to `limit` and more changes are already waiting — poll again immediately; otherwise wait your normal interval (e.g. 5–15s).  This is NOT pagination — it is a time-keyed change feed. Use the paginated GET /job-requests for the initial bulk load, then this endpoint to stay live. Filters (status_keys, customer_id, …) narrow the feed to the slice you care about.
+        Keep an external system (your CRM, ERP or field-operations tool) in sync with bookings WITHOUT re-listing everything: returns the job requests (work orders) whose state changed (created, status transition, reschedule, soft-delete/archive) at or after the `since` cursor, ordered oldest-change-first (updated_at ASC).  How to use it: (1) On your first poll OMIT `since` — the server primes the cursor at \"now\", returns no items and a `next_since`. (2) Store `next_since` and pass it as `since` on the next poll. (3) Apply each returned item to your store by UPSERTING on `id` (the server re-scans a ~5s safety window, so the same job may appear again — never blindly append). (4) If `has_more` is true the page filled to `limit` and more changes are already waiting — poll again immediately; otherwise wait your normal interval (e.g. 5–15s).  This is NOT pagination — it is a time-keyed change feed. Use the paginated GET /job-requests for the initial bulk load, then this endpoint to stay live. Filters (status_keys, customer_id, …) narrow the feed to the slice you care about.
 
         :param status_keys: Comma-separated status slugs — only surface changes to jobs in these statuses
         :type status_keys: str
@@ -3192,6 +3835,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequestChanges200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -3231,7 +3875,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[ListJobRequestChanges200Response]:
         """Poll for new & changed job requests (sync feed)
 
-        Keep an external system (your CRM, ERP or field-service tool) in sync with bookings WITHOUT re-listing everything: returns the job requests (work orders) whose state changed (created, status transition, reschedule, soft-delete/archive) at or after the `since` cursor, ordered oldest-change-first (updated_at ASC).  How to use it: (1) On your first poll OMIT `since` — the server primes the cursor at \"now\", returns no items and a `next_since`. (2) Store `next_since` and pass it as `since` on the next poll. (3) Apply each returned item to your store by UPSERTING on `id` (the server re-scans a ~5s safety window, so the same job may appear again — never blindly append). (4) If `has_more` is true the page filled to `limit` and more changes are already waiting — poll again immediately; otherwise wait your normal interval (e.g. 5–15s).  This is NOT pagination — it is a time-keyed change feed. Use the paginated GET /job-requests for the initial bulk load, then this endpoint to stay live. Filters (status_keys, customer_id, …) narrow the feed to the slice you care about.
+        Keep an external system (your CRM, ERP or field-operations tool) in sync with bookings WITHOUT re-listing everything: returns the job requests (work orders) whose state changed (created, status transition, reschedule, soft-delete/archive) at or after the `since` cursor, ordered oldest-change-first (updated_at ASC).  How to use it: (1) On your first poll OMIT `since` — the server primes the cursor at \"now\", returns no items and a `next_since`. (2) Store `next_since` and pass it as `since` on the next poll. (3) Apply each returned item to your store by UPSERTING on `id` (the server re-scans a ~5s safety window, so the same job may appear again — never blindly append). (4) If `has_more` is true the page filled to `limit` and more changes are already waiting — poll again immediately; otherwise wait your normal interval (e.g. 5–15s).  This is NOT pagination — it is a time-keyed change feed. Use the paginated GET /job-requests for the initial bulk load, then this endpoint to stay live. Filters (status_keys, customer_id, …) narrow the feed to the slice you care about.
 
         :param status_keys: Comma-separated status slugs — only surface changes to jobs in these statuses
         :type status_keys: str
@@ -3290,6 +3934,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequestChanges200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -3329,7 +3974,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Poll for new & changed job requests (sync feed)
 
-        Keep an external system (your CRM, ERP or field-service tool) in sync with bookings WITHOUT re-listing everything: returns the job requests (work orders) whose state changed (created, status transition, reschedule, soft-delete/archive) at or after the `since` cursor, ordered oldest-change-first (updated_at ASC).  How to use it: (1) On your first poll OMIT `since` — the server primes the cursor at \"now\", returns no items and a `next_since`. (2) Store `next_since` and pass it as `since` on the next poll. (3) Apply each returned item to your store by UPSERTING on `id` (the server re-scans a ~5s safety window, so the same job may appear again — never blindly append). (4) If `has_more` is true the page filled to `limit` and more changes are already waiting — poll again immediately; otherwise wait your normal interval (e.g. 5–15s).  This is NOT pagination — it is a time-keyed change feed. Use the paginated GET /job-requests for the initial bulk load, then this endpoint to stay live. Filters (status_keys, customer_id, …) narrow the feed to the slice you care about.
+        Keep an external system (your CRM, ERP or field-operations tool) in sync with bookings WITHOUT re-listing everything: returns the job requests (work orders) whose state changed (created, status transition, reschedule, soft-delete/archive) at or after the `since` cursor, ordered oldest-change-first (updated_at ASC).  How to use it: (1) On your first poll OMIT `since` — the server primes the cursor at \"now\", returns no items and a `next_since`. (2) Store `next_since` and pass it as `since` on the next poll. (3) Apply each returned item to your store by UPSERTING on `id` (the server re-scans a ~5s safety window, so the same job may appear again — never blindly append). (4) If `has_more` is true the page filled to `limit` and more changes are already waiting — poll again immediately; otherwise wait your normal interval (e.g. 5–15s).  This is NOT pagination — it is a time-keyed change feed. Use the paginated GET /job-requests for the initial bulk load, then this endpoint to stay live. Filters (status_keys, customer_id, …) narrow the feed to the slice you care about.
 
         :param status_keys: Comma-separated status slugs — only surface changes to jobs in these statuses
         :type status_keys: str
@@ -3388,6 +4033,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequestChanges200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -3509,6 +4155,8 @@ class JobRequestBusinessApi:
         service_area_id: Annotated[Optional[StrictStr], Field(description="Service-area UUID (board zone filter)")] = None,
         scheduled_from: Annotated[Optional[StrictStr], Field(description="Filter from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to)")] = None,
         scheduled_to: Annotated[Optional[StrictStr], Field(description="Filter to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive")] = None,
+        completed_from: Annotated[Optional[StrictStr], Field(description="Filter by completion time from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to). Counts jobs by when they were completed regardless of reschedules.")] = None,
+        completed_to: Annotated[Optional[StrictStr], Field(description="Filter by completion time to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive")] = None,
         q: Annotated[Optional[StrictStr], Field(description="Search short_code or description (case-insensitive, partial match)")] = None,
         sort: Annotated[Optional[StrictStr], Field(description="Sort key: created_at:desc (default) | created_at:asc | scheduled_at:asc | scheduled_at:desc | priority:asc (P0 first) | priority:desc")] = None,
         page: Annotated[Optional[StrictInt], Field(description="Page number")] = None,
@@ -3546,6 +4194,10 @@ class JobRequestBusinessApi:
         :type scheduled_from: str
         :param scheduled_to: Filter to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive
         :type scheduled_to: str
+        :param completed_from: Filter by completion time from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to). Counts jobs by when they were completed regardless of reschedules.
+        :type completed_from: str
+        :param completed_to: Filter by completion time to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive
+        :type completed_to: str
         :param q: Search short_code or description (case-insensitive, partial match)
         :type q: str
         :param sort: Sort key: created_at:desc (default) | created_at:asc | scheduled_at:asc | scheduled_at:desc | priority:asc (P0 first) | priority:desc
@@ -3585,6 +4237,8 @@ class JobRequestBusinessApi:
             service_area_id=service_area_id,
             scheduled_from=scheduled_from,
             scheduled_to=scheduled_to,
+            completed_from=completed_from,
+            completed_to=completed_to,
             q=q,
             sort=sort,
             page=page,
@@ -3599,6 +4253,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequests200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -3623,6 +4278,8 @@ class JobRequestBusinessApi:
         service_area_id: Annotated[Optional[StrictStr], Field(description="Service-area UUID (board zone filter)")] = None,
         scheduled_from: Annotated[Optional[StrictStr], Field(description="Filter from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to)")] = None,
         scheduled_to: Annotated[Optional[StrictStr], Field(description="Filter to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive")] = None,
+        completed_from: Annotated[Optional[StrictStr], Field(description="Filter by completion time from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to). Counts jobs by when they were completed regardless of reschedules.")] = None,
+        completed_to: Annotated[Optional[StrictStr], Field(description="Filter by completion time to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive")] = None,
         q: Annotated[Optional[StrictStr], Field(description="Search short_code or description (case-insensitive, partial match)")] = None,
         sort: Annotated[Optional[StrictStr], Field(description="Sort key: created_at:desc (default) | created_at:asc | scheduled_at:asc | scheduled_at:desc | priority:asc (P0 first) | priority:desc")] = None,
         page: Annotated[Optional[StrictInt], Field(description="Page number")] = None,
@@ -3660,6 +4317,10 @@ class JobRequestBusinessApi:
         :type scheduled_from: str
         :param scheduled_to: Filter to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive
         :type scheduled_to: str
+        :param completed_from: Filter by completion time from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to). Counts jobs by when they were completed regardless of reschedules.
+        :type completed_from: str
+        :param completed_to: Filter by completion time to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive
+        :type completed_to: str
         :param q: Search short_code or description (case-insensitive, partial match)
         :type q: str
         :param sort: Sort key: created_at:desc (default) | created_at:asc | scheduled_at:asc | scheduled_at:desc | priority:asc (P0 first) | priority:desc
@@ -3699,6 +4360,8 @@ class JobRequestBusinessApi:
             service_area_id=service_area_id,
             scheduled_from=scheduled_from,
             scheduled_to=scheduled_to,
+            completed_from=completed_from,
+            completed_to=completed_to,
             q=q,
             sort=sort,
             page=page,
@@ -3713,6 +4376,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequests200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -3737,6 +4401,8 @@ class JobRequestBusinessApi:
         service_area_id: Annotated[Optional[StrictStr], Field(description="Service-area UUID (board zone filter)")] = None,
         scheduled_from: Annotated[Optional[StrictStr], Field(description="Filter from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to)")] = None,
         scheduled_to: Annotated[Optional[StrictStr], Field(description="Filter to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive")] = None,
+        completed_from: Annotated[Optional[StrictStr], Field(description="Filter by completion time from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to). Counts jobs by when they were completed regardless of reschedules.")] = None,
+        completed_to: Annotated[Optional[StrictStr], Field(description="Filter by completion time to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive")] = None,
         q: Annotated[Optional[StrictStr], Field(description="Search short_code or description (case-insensitive, partial match)")] = None,
         sort: Annotated[Optional[StrictStr], Field(description="Sort key: created_at:desc (default) | created_at:asc | scheduled_at:asc | scheduled_at:desc | priority:asc (P0 first) | priority:desc")] = None,
         page: Annotated[Optional[StrictInt], Field(description="Page number")] = None,
@@ -3774,6 +4440,10 @@ class JobRequestBusinessApi:
         :type scheduled_from: str
         :param scheduled_to: Filter to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive
         :type scheduled_to: str
+        :param completed_from: Filter by completion time from (YYYY-MM-DD = start of that day in the business timezone, or RFC3339); range is [from, to). Counts jobs by when they were completed regardless of reschedules.
+        :type completed_from: str
+        :param completed_to: Filter by completion time to (YYYY-MM-DD = end of that day in the business timezone, or RFC3339), exclusive
+        :type completed_to: str
         :param q: Search short_code or description (case-insensitive, partial match)
         :type q: str
         :param sort: Sort key: created_at:desc (default) | created_at:asc | scheduled_at:asc | scheduled_at:desc | priority:asc (P0 first) | priority:desc
@@ -3813,6 +4483,8 @@ class JobRequestBusinessApi:
             service_area_id=service_area_id,
             scheduled_from=scheduled_from,
             scheduled_to=scheduled_to,
+            completed_from=completed_from,
+            completed_to=completed_to,
             q=q,
             sort=sort,
             page=page,
@@ -3827,6 +4499,7 @@ class JobRequestBusinessApi:
             '200': "ListJobRequests200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -3846,6 +4519,8 @@ class JobRequestBusinessApi:
         service_area_id,
         scheduled_from,
         scheduled_to,
+        completed_from,
+        completed_to,
         q,
         sort,
         page,
@@ -3903,6 +4578,14 @@ class JobRequestBusinessApi:
         if scheduled_to is not None:
             
             _query_params.append(('scheduled_to', scheduled_to))
+            
+        if completed_from is not None:
+            
+            _query_params.append(('completed_from', completed_from))
+            
+        if completed_to is not None:
+            
+            _query_params.append(('completed_to', completed_to))
             
         if q is not None:
             
@@ -4018,6 +4701,7 @@ class JobRequestBusinessApi:
             '200': "ListMatchingSlots200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -4093,6 +4777,7 @@ class JobRequestBusinessApi:
             '200': "ListMatchingSlots200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -4168,6 +4853,7 @@ class JobRequestBusinessApi:
             '200': "ListMatchingSlots200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -4324,6 +5010,7 @@ class JobRequestBusinessApi:
             '200': "ListNearbyTechnicians200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -4414,6 +5101,7 @@ class JobRequestBusinessApi:
             '200': "ListNearbyTechnicians200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -4504,6 +5192,7 @@ class JobRequestBusinessApi:
             '200': "ListNearbyTechnicians200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -4605,6 +5294,298 @@ class JobRequestBusinessApi:
 
 
     @validate_call
+    def preview_absence_resolve(
+        self,
+        job_request_absence_preview_request: Annotated[JobRequestAbsencePreviewRequest, Field(description="absent technician + date range (+ optional job subset)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> CommitAbsenceResolve200Response:
+        """Preview re-staffing a technician's whole day (sick call)
+
+        Solves (WITHOUT writing) the re-staffing of every job on a technician's board for a date range: each job is handed to an ALTERNATE lead technician at its UNCHANGED window — the customer's appointment never moves, two overlapping jobs never land on the same alternate, and the absent technician is never a candidate. `date`/`until_date` are business-local calendar days (inclusive, ≤ 14 days). Jobs the planner cannot re-staff come back in `unresolved` with a `reason_code` (no qualified technician free / crew job / multi-day job / already in progress) — a partial plan is a normal 200, not an error. `solver.duration_ms` is server-side planner time; `solver.deterministic` is true (same input ⇒ same plan). Read-only, safe to repeat; copy `resolved[]` into the commit body. No time-off record is required to preview. When the strict pass leaves a job unresolved, its row ALSO carries `alternatives[]` — the relaxation ladder's priced options, cheapest constraint first (ABSENCE_RESOLVE_DESIGN.md §9): `reassign_out_of_area` (same window, a lead outside the job's zone — cost.distance_km/travel_minutes), then `reschedule_same_day` / `reschedule_later_day` (the earliest free window on a qualified lead, in-area before out-of-area, up to 3 working days past until_date — cost.customer_renotified, cost.day_offset, cost.sla_breached). Each option is a PROPOSAL: nothing is applied until the coordinator copies it into the commit body with its `alternative_kind` (+ `start_at`/`end_at` for a reschedule). `alternatives` is an empty array when even the ladder found nothing; `solver.alternatives_truncated` is true when the ladder's time budget cut the search short. Displacing another customer's job and overtime are deliberately NOT offered. See ABSENCE_RESOLVE_DESIGN.md.
+
+        :param job_request_absence_preview_request: absent technician + date range (+ optional job subset) (required)
+        :type job_request_absence_preview_request: JobRequestAbsencePreviewRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._preview_absence_resolve_serialize(
+            job_request_absence_preview_request=job_request_absence_preview_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CommitAbsenceResolve200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def preview_absence_resolve_with_http_info(
+        self,
+        job_request_absence_preview_request: Annotated[JobRequestAbsencePreviewRequest, Field(description="absent technician + date range (+ optional job subset)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[CommitAbsenceResolve200Response]:
+        """Preview re-staffing a technician's whole day (sick call)
+
+        Solves (WITHOUT writing) the re-staffing of every job on a technician's board for a date range: each job is handed to an ALTERNATE lead technician at its UNCHANGED window — the customer's appointment never moves, two overlapping jobs never land on the same alternate, and the absent technician is never a candidate. `date`/`until_date` are business-local calendar days (inclusive, ≤ 14 days). Jobs the planner cannot re-staff come back in `unresolved` with a `reason_code` (no qualified technician free / crew job / multi-day job / already in progress) — a partial plan is a normal 200, not an error. `solver.duration_ms` is server-side planner time; `solver.deterministic` is true (same input ⇒ same plan). Read-only, safe to repeat; copy `resolved[]` into the commit body. No time-off record is required to preview. When the strict pass leaves a job unresolved, its row ALSO carries `alternatives[]` — the relaxation ladder's priced options, cheapest constraint first (ABSENCE_RESOLVE_DESIGN.md §9): `reassign_out_of_area` (same window, a lead outside the job's zone — cost.distance_km/travel_minutes), then `reschedule_same_day` / `reschedule_later_day` (the earliest free window on a qualified lead, in-area before out-of-area, up to 3 working days past until_date — cost.customer_renotified, cost.day_offset, cost.sla_breached). Each option is a PROPOSAL: nothing is applied until the coordinator copies it into the commit body with its `alternative_kind` (+ `start_at`/`end_at` for a reschedule). `alternatives` is an empty array when even the ladder found nothing; `solver.alternatives_truncated` is true when the ladder's time budget cut the search short. Displacing another customer's job and overtime are deliberately NOT offered. See ABSENCE_RESOLVE_DESIGN.md.
+
+        :param job_request_absence_preview_request: absent technician + date range (+ optional job subset) (required)
+        :type job_request_absence_preview_request: JobRequestAbsencePreviewRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._preview_absence_resolve_serialize(
+            job_request_absence_preview_request=job_request_absence_preview_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CommitAbsenceResolve200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def preview_absence_resolve_without_preload_content(
+        self,
+        job_request_absence_preview_request: Annotated[JobRequestAbsencePreviewRequest, Field(description="absent technician + date range (+ optional job subset)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Preview re-staffing a technician's whole day (sick call)
+
+        Solves (WITHOUT writing) the re-staffing of every job on a technician's board for a date range: each job is handed to an ALTERNATE lead technician at its UNCHANGED window — the customer's appointment never moves, two overlapping jobs never land on the same alternate, and the absent technician is never a candidate. `date`/`until_date` are business-local calendar days (inclusive, ≤ 14 days). Jobs the planner cannot re-staff come back in `unresolved` with a `reason_code` (no qualified technician free / crew job / multi-day job / already in progress) — a partial plan is a normal 200, not an error. `solver.duration_ms` is server-side planner time; `solver.deterministic` is true (same input ⇒ same plan). Read-only, safe to repeat; copy `resolved[]` into the commit body. No time-off record is required to preview. When the strict pass leaves a job unresolved, its row ALSO carries `alternatives[]` — the relaxation ladder's priced options, cheapest constraint first (ABSENCE_RESOLVE_DESIGN.md §9): `reassign_out_of_area` (same window, a lead outside the job's zone — cost.distance_km/travel_minutes), then `reschedule_same_day` / `reschedule_later_day` (the earliest free window on a qualified lead, in-area before out-of-area, up to 3 working days past until_date — cost.customer_renotified, cost.day_offset, cost.sla_breached). Each option is a PROPOSAL: nothing is applied until the coordinator copies it into the commit body with its `alternative_kind` (+ `start_at`/`end_at` for a reschedule). `alternatives` is an empty array when even the ladder found nothing; `solver.alternatives_truncated` is true when the ladder's time budget cut the search short. Displacing another customer's job and overtime are deliberately NOT offered. See ABSENCE_RESOLVE_DESIGN.md.
+
+        :param job_request_absence_preview_request: absent technician + date range (+ optional job subset) (required)
+        :type job_request_absence_preview_request: JobRequestAbsencePreviewRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._preview_absence_resolve_serialize(
+            job_request_absence_preview_request=job_request_absence_preview_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CommitAbsenceResolve200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _preview_absence_resolve_serialize(
+        self,
+        job_request_absence_preview_request,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+        if job_request_absence_preview_request is not None:
+            _body_params = job_request_absence_preview_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/job-requests/absence/preview',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
     def preview_emergency_reschedule(
         self,
         job_request_emergency_preview_request: Annotated[JobRequestEmergencyPreviewRequest, Field(description="emergency insert spec")],
@@ -4623,7 +5604,7 @@ class JobRequestBusinessApi:
     ) -> CommitEmergencyReschedule200Response:
         """Preview emergency insert + cascade reschedule
 
-        Computes (WITHOUT writing) the cascade of inserting an emergency job onto a technician at a chosen time: where the emergency lands + every job pushed back, grouped per business-local day. `displacement_mode=reassign` instead hands each displaced job to another feasible technician at its ORIGINAL window (same-day promise) — jobs with no alternate capacity fall back to reschedule and stay in `days`. `mode=overtime` keeps everyone same-day (tech works late); `mode=next_day` rolls overflow to the next working day(s). Read-only — safe to call repeatedly; commit is a separate endpoint. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — the landing window is blocked by a job the cascade may NOT move (another P0, a crew or multi-day job): choose another technician (walk the /candidates ranking) or another time; displacement never touches P0/crew/multi-day anchors. EMERGENCY_RESCHEDULE_NOT_ELIGIBLE / CREW_UNSUPPORTED / MULTIDAY_UNSUPPORTED / NO_WORKING_DAY / IN_PAST — same remedies as /candidates.
+        Computes (WITHOUT writing) the cascade of inserting an emergency job onto a technician at a chosen time: where the emergency lands + every job pushed back, grouped per business-local day. `displacement_mode=reassign` instead hands each displaced job to another feasible technician at its ORIGINAL window (same-day promise) — jobs with no alternate capacity fall back to reschedule and stay in `days`. `mode=overtime` keeps everyone same-day (tech works late); `mode=next_day` rolls overflow to the next working day(s). `after_hours_override=true` — the coordinator has phoned the technician — drops the non-working-day rejection; the response then carries an AFTER_HOURS warning naming how far outside the window the insert sits. This endpoint never runs the technician's working-hours/time-off feasibility check (that only happens on /candidates) — it validates the named technician exists and builds the cascade. Read-only — safe to call repeatedly; commit is a separate endpoint. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — the landing window is blocked by a job the cascade may NOT move (another P0, a crew or multi-day job); `data.conflicts[]` names each blocking job (short_code/start_at/end_at/frozen_because): choose another technician (walk the /candidates ranking) or another time; displacement never touches P0/crew/multi-day anchors. EMERGENCY_RESCHEDULE_NOT_ELIGIBLE / CREW_UNSUPPORTED / MULTIDAY_UNSUPPORTED / IN_PAST — same remedies and `data` shapes as /candidates. EMERGENCY_RESCHEDULE_NO_WORKING_DAY does NOT fire when after_hours_override=true.
 
         :param job_request_emergency_preview_request: emergency insert spec (required)
         :type job_request_emergency_preview_request: JobRequestEmergencyPreviewRequest
@@ -4696,7 +5677,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[CommitEmergencyReschedule200Response]:
         """Preview emergency insert + cascade reschedule
 
-        Computes (WITHOUT writing) the cascade of inserting an emergency job onto a technician at a chosen time: where the emergency lands + every job pushed back, grouped per business-local day. `displacement_mode=reassign` instead hands each displaced job to another feasible technician at its ORIGINAL window (same-day promise) — jobs with no alternate capacity fall back to reschedule and stay in `days`. `mode=overtime` keeps everyone same-day (tech works late); `mode=next_day` rolls overflow to the next working day(s). Read-only — safe to call repeatedly; commit is a separate endpoint. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — the landing window is blocked by a job the cascade may NOT move (another P0, a crew or multi-day job): choose another technician (walk the /candidates ranking) or another time; displacement never touches P0/crew/multi-day anchors. EMERGENCY_RESCHEDULE_NOT_ELIGIBLE / CREW_UNSUPPORTED / MULTIDAY_UNSUPPORTED / NO_WORKING_DAY / IN_PAST — same remedies as /candidates.
+        Computes (WITHOUT writing) the cascade of inserting an emergency job onto a technician at a chosen time: where the emergency lands + every job pushed back, grouped per business-local day. `displacement_mode=reassign` instead hands each displaced job to another feasible technician at its ORIGINAL window (same-day promise) — jobs with no alternate capacity fall back to reschedule and stay in `days`. `mode=overtime` keeps everyone same-day (tech works late); `mode=next_day` rolls overflow to the next working day(s). `after_hours_override=true` — the coordinator has phoned the technician — drops the non-working-day rejection; the response then carries an AFTER_HOURS warning naming how far outside the window the insert sits. This endpoint never runs the technician's working-hours/time-off feasibility check (that only happens on /candidates) — it validates the named technician exists and builds the cascade. Read-only — safe to call repeatedly; commit is a separate endpoint. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — the landing window is blocked by a job the cascade may NOT move (another P0, a crew or multi-day job); `data.conflicts[]` names each blocking job (short_code/start_at/end_at/frozen_because): choose another technician (walk the /candidates ranking) or another time; displacement never touches P0/crew/multi-day anchors. EMERGENCY_RESCHEDULE_NOT_ELIGIBLE / CREW_UNSUPPORTED / MULTIDAY_UNSUPPORTED / IN_PAST — same remedies and `data` shapes as /candidates. EMERGENCY_RESCHEDULE_NO_WORKING_DAY does NOT fire when after_hours_override=true.
 
         :param job_request_emergency_preview_request: emergency insert spec (required)
         :type job_request_emergency_preview_request: JobRequestEmergencyPreviewRequest
@@ -4769,7 +5750,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Preview emergency insert + cascade reschedule
 
-        Computes (WITHOUT writing) the cascade of inserting an emergency job onto a technician at a chosen time: where the emergency lands + every job pushed back, grouped per business-local day. `displacement_mode=reassign` instead hands each displaced job to another feasible technician at its ORIGINAL window (same-day promise) — jobs with no alternate capacity fall back to reschedule and stay in `days`. `mode=overtime` keeps everyone same-day (tech works late); `mode=next_day` rolls overflow to the next working day(s). Read-only — safe to call repeatedly; commit is a separate endpoint. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — the landing window is blocked by a job the cascade may NOT move (another P0, a crew or multi-day job): choose another technician (walk the /candidates ranking) or another time; displacement never touches P0/crew/multi-day anchors. EMERGENCY_RESCHEDULE_NOT_ELIGIBLE / CREW_UNSUPPORTED / MULTIDAY_UNSUPPORTED / NO_WORKING_DAY / IN_PAST — same remedies as /candidates.
+        Computes (WITHOUT writing) the cascade of inserting an emergency job onto a technician at a chosen time: where the emergency lands + every job pushed back, grouped per business-local day. `displacement_mode=reassign` instead hands each displaced job to another feasible technician at its ORIGINAL window (same-day promise) — jobs with no alternate capacity fall back to reschedule and stay in `days`. `mode=overtime` keeps everyone same-day (tech works late); `mode=next_day` rolls overflow to the next working day(s). `after_hours_override=true` — the coordinator has phoned the technician — drops the non-working-day rejection; the response then carries an AFTER_HOURS warning naming how far outside the window the insert sits. This endpoint never runs the technician's working-hours/time-off feasibility check (that only happens on /candidates) — it validates the named technician exists and builds the cascade. Read-only — safe to call repeatedly; commit is a separate endpoint. Isolated feature (see EMERGENCY_RESCHEDULE_DESIGN.md). 409 NEXT STEPS: EMERGENCY_RESCHEDULE_SLOT_OCCUPIED — the landing window is blocked by a job the cascade may NOT move (another P0, a crew or multi-day job); `data.conflicts[]` names each blocking job (short_code/start_at/end_at/frozen_because): choose another technician (walk the /candidates ranking) or another time; displacement never touches P0/crew/multi-day anchors. EMERGENCY_RESCHEDULE_NOT_ELIGIBLE / CREW_UNSUPPORTED / MULTIDAY_UNSUPPORTED / IN_PAST — same remedies and `data` shapes as /candidates. EMERGENCY_RESCHEDULE_NO_WORKING_DAY does NOT fire when after_hours_override=true.
 
         :param job_request_emergency_preview_request: emergency insert spec (required)
         :type job_request_emergency_preview_request: JobRequestEmergencyPreviewRequest
@@ -4916,7 +5897,7 @@ class JobRequestBusinessApi:
     ) -> CommitJobRequestMove200Response:
         """Preview a schedule-board job move
 
-        Computes (WITHOUT writing) the outcome of moving a confirmed job to a new time and/or technician: where it lands, every later job pushed back per `mode`, and the warnings the coordinator would accept (displaced jobs leaving their confirmed windows, overtime). Same technician = pure time move; different technician = manual reassign. Read-only — safe to call repeatedly while dragging; commit is a separate endpoint. See SCHEDULE_BOARD_DESIGN.md. Warning detail: a TECH_NOT_FEASIBLE warning carries `reason` = `cannot_arrive_in_time` (commute from the tech day-start location / shift start; `earliest_feasible_at` (RFC3339 UTC) is the first same-day time they CAN be on site — suggest it as the drop slot) | `missing_required_skills` | `not_available_today` (no working hours, approved time off, or outside the service area) | `not_lead_tier`. For a P0 move this warning is advisory (coordinator may commit anyway); for p1/p2/p3 the same condition is the hard 409 SCHEDULE_MOVE_TECH_INFEASIBLE. 409 NEXT STEPS: SCHEDULE_MOVE_NOT_ELIGIBLE (job unconfirmed/unquoted/archived/completed — not movable) · SCHEDULE_MOVE_IN_PROGRESS (tech already executing — do not move) · SCHEDULE_MOVE_IN_PAST (pick a future time) · SCHEDULE_MOVE_OUTSIDE_WINDOW (landing time outside the customer-confirmed window — hard block; pick a time inside it) · SCHEDULE_MOVE_SLOT_OCCUPIED (landing window blocked by an immovable anchor — another tech/time) · SCHEDULE_MOVE_TECH_INFEASIBLE (non-P0 hard block: target tech not qualified/available — see the TECH_NOT_FEASIBLE warning reasons; change tech or time) · SCHEDULE_MOVE_MULTIDAY_UNSUPPORTED (multi-day jobs not movable v1) · SCHEDULE_MOVE_NO_WORKING_DAY (pick a working day) · SCHEDULE_MOVE_REQUIRES_FREE_SLOT (non-P0 moves may not displace — free capacity only, unless the owner enables allow_non_p0_displacement) · SCHEDULE_MOVE_CREW_UNSTAFFABLE (a crew slot has no feasible replacement at the new time — another time).
+        Computes (WITHOUT writing) the outcome of moving a confirmed job to a new time and/or technician: where it lands, every later job pushed back per `mode`, and the warnings the coordinator would accept (displaced jobs leaving their confirmed windows, overtime). Same technician = pure time move; different technician = manual reassign. Read-only — safe to call repeatedly while dragging; commit is a separate endpoint. See SCHEDULE_BOARD_DESIGN.md. Warning detail: a TECH_NOT_FEASIBLE warning carries `reason` (= `blockers[0].kind`) = `outside_service_area` | `missing_required_skills` | `not_lead_tier` | `no_working_day` | `on_time_off` | `off_shift` | `visit_too_long` | `cannot_arrive_in_time` (commute from the tech day-start location / shift start; `earliest_feasible_at`, RFC3339 UTC, is the first same-day time they CAN be on site — suggest it as the drop slot) | `not_available_today` (diagnosis unavailable). `blockers[]` names EVERY hard filter that failed, most-structural first — a client reading only `reason` still works. For a P0 move this warning is advisory (coordinator may commit anyway) and carries the SAME `blockers[]` a p1/p2/p3 move would get as the hard 409 SCHEDULE_MOVE_TECH_INFEASIBLE below. 409 NEXT STEPS: SCHEDULE_MOVE_NOT_ELIGIBLE (job unconfirmed/unquoted/archived/completed — `data.failed_precondition` names which) · SCHEDULE_MOVE_IN_PROGRESS (tech already executing — `data.fired_actions[]` lists the actions already fired; do not move) · SCHEDULE_MOVE_IN_PAST (pick a future time — its `data` carries `business_timezone`, the naive `start_at` and the `start_at_utc` it resolved to, which is what tells a caller whose own clock says otherwise where the difference came from) · SCHEDULE_MOVE_SLOT_OCCUPIED (landing window blocked by an immovable anchor; `data.conflicts[]` names it — another tech/time) · SCHEDULE_MOVE_TECH_INFEASIBLE (non-P0 hard block: target tech not qualified/available — its `data` carries `technician` (id+name), `reason` (same catalog as the TECH_NOT_FEASIBLE warning above), `blockers[]` (every cause, most-structural first) and, for `cannot_arrive_in_time`, `earliest_feasible_at` (RFC3339 UTC) to suggest as the drop slot; change tech or time) · SCHEDULE_MOVE_MULTIDAY_UNSUPPORTED (multi-day jobs not movable v1 — `data.session_count`/`data.session_dates`) · SCHEDULE_MOVE_NO_WORKING_DAY (`data.business_timezone`/`data.requested_weekday` — pick a working day, or set after_hours_override=true for a P0 whose technician has been phoned) · SCHEDULE_MOVE_REQUIRES_FREE_SLOT (non-P0 moves may not displace — `data.would_push[]` names the jobs that would be pushed, `data.allow_non_p0_displacement: false` names the setting that would permit it, unless the crew case sets `data.crew_never_displaces: true` instead — free capacity only) · SCHEDULE_MOVE_CREW_UNSTAFFABLE (a crew slot has no feasible replacement at the new time — another time). A landing outside the customer-confirmed window is NOT an error — it returns 200 with a MOVED_OUTSIDE_WINDOW warning (customer_window attached) that the coordinator overrides.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -4993,7 +5974,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[CommitJobRequestMove200Response]:
         """Preview a schedule-board job move
 
-        Computes (WITHOUT writing) the outcome of moving a confirmed job to a new time and/or technician: where it lands, every later job pushed back per `mode`, and the warnings the coordinator would accept (displaced jobs leaving their confirmed windows, overtime). Same technician = pure time move; different technician = manual reassign. Read-only — safe to call repeatedly while dragging; commit is a separate endpoint. See SCHEDULE_BOARD_DESIGN.md. Warning detail: a TECH_NOT_FEASIBLE warning carries `reason` = `cannot_arrive_in_time` (commute from the tech day-start location / shift start; `earliest_feasible_at` (RFC3339 UTC) is the first same-day time they CAN be on site — suggest it as the drop slot) | `missing_required_skills` | `not_available_today` (no working hours, approved time off, or outside the service area) | `not_lead_tier`. For a P0 move this warning is advisory (coordinator may commit anyway); for p1/p2/p3 the same condition is the hard 409 SCHEDULE_MOVE_TECH_INFEASIBLE. 409 NEXT STEPS: SCHEDULE_MOVE_NOT_ELIGIBLE (job unconfirmed/unquoted/archived/completed — not movable) · SCHEDULE_MOVE_IN_PROGRESS (tech already executing — do not move) · SCHEDULE_MOVE_IN_PAST (pick a future time) · SCHEDULE_MOVE_OUTSIDE_WINDOW (landing time outside the customer-confirmed window — hard block; pick a time inside it) · SCHEDULE_MOVE_SLOT_OCCUPIED (landing window blocked by an immovable anchor — another tech/time) · SCHEDULE_MOVE_TECH_INFEASIBLE (non-P0 hard block: target tech not qualified/available — see the TECH_NOT_FEASIBLE warning reasons; change tech or time) · SCHEDULE_MOVE_MULTIDAY_UNSUPPORTED (multi-day jobs not movable v1) · SCHEDULE_MOVE_NO_WORKING_DAY (pick a working day) · SCHEDULE_MOVE_REQUIRES_FREE_SLOT (non-P0 moves may not displace — free capacity only, unless the owner enables allow_non_p0_displacement) · SCHEDULE_MOVE_CREW_UNSTAFFABLE (a crew slot has no feasible replacement at the new time — another time).
+        Computes (WITHOUT writing) the outcome of moving a confirmed job to a new time and/or technician: where it lands, every later job pushed back per `mode`, and the warnings the coordinator would accept (displaced jobs leaving their confirmed windows, overtime). Same technician = pure time move; different technician = manual reassign. Read-only — safe to call repeatedly while dragging; commit is a separate endpoint. See SCHEDULE_BOARD_DESIGN.md. Warning detail: a TECH_NOT_FEASIBLE warning carries `reason` (= `blockers[0].kind`) = `outside_service_area` | `missing_required_skills` | `not_lead_tier` | `no_working_day` | `on_time_off` | `off_shift` | `visit_too_long` | `cannot_arrive_in_time` (commute from the tech day-start location / shift start; `earliest_feasible_at`, RFC3339 UTC, is the first same-day time they CAN be on site — suggest it as the drop slot) | `not_available_today` (diagnosis unavailable). `blockers[]` names EVERY hard filter that failed, most-structural first — a client reading only `reason` still works. For a P0 move this warning is advisory (coordinator may commit anyway) and carries the SAME `blockers[]` a p1/p2/p3 move would get as the hard 409 SCHEDULE_MOVE_TECH_INFEASIBLE below. 409 NEXT STEPS: SCHEDULE_MOVE_NOT_ELIGIBLE (job unconfirmed/unquoted/archived/completed — `data.failed_precondition` names which) · SCHEDULE_MOVE_IN_PROGRESS (tech already executing — `data.fired_actions[]` lists the actions already fired; do not move) · SCHEDULE_MOVE_IN_PAST (pick a future time — its `data` carries `business_timezone`, the naive `start_at` and the `start_at_utc` it resolved to, which is what tells a caller whose own clock says otherwise where the difference came from) · SCHEDULE_MOVE_SLOT_OCCUPIED (landing window blocked by an immovable anchor; `data.conflicts[]` names it — another tech/time) · SCHEDULE_MOVE_TECH_INFEASIBLE (non-P0 hard block: target tech not qualified/available — its `data` carries `technician` (id+name), `reason` (same catalog as the TECH_NOT_FEASIBLE warning above), `blockers[]` (every cause, most-structural first) and, for `cannot_arrive_in_time`, `earliest_feasible_at` (RFC3339 UTC) to suggest as the drop slot; change tech or time) · SCHEDULE_MOVE_MULTIDAY_UNSUPPORTED (multi-day jobs not movable v1 — `data.session_count`/`data.session_dates`) · SCHEDULE_MOVE_NO_WORKING_DAY (`data.business_timezone`/`data.requested_weekday` — pick a working day, or set after_hours_override=true for a P0 whose technician has been phoned) · SCHEDULE_MOVE_REQUIRES_FREE_SLOT (non-P0 moves may not displace — `data.would_push[]` names the jobs that would be pushed, `data.allow_non_p0_displacement: false` names the setting that would permit it, unless the crew case sets `data.crew_never_displaces: true` instead — free capacity only) · SCHEDULE_MOVE_CREW_UNSTAFFABLE (a crew slot has no feasible replacement at the new time — another time). A landing outside the customer-confirmed window is NOT an error — it returns 200 with a MOVED_OUTSIDE_WINDOW warning (customer_window attached) that the coordinator overrides.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -5070,7 +6051,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Preview a schedule-board job move
 
-        Computes (WITHOUT writing) the outcome of moving a confirmed job to a new time and/or technician: where it lands, every later job pushed back per `mode`, and the warnings the coordinator would accept (displaced jobs leaving their confirmed windows, overtime). Same technician = pure time move; different technician = manual reassign. Read-only — safe to call repeatedly while dragging; commit is a separate endpoint. See SCHEDULE_BOARD_DESIGN.md. Warning detail: a TECH_NOT_FEASIBLE warning carries `reason` = `cannot_arrive_in_time` (commute from the tech day-start location / shift start; `earliest_feasible_at` (RFC3339 UTC) is the first same-day time they CAN be on site — suggest it as the drop slot) | `missing_required_skills` | `not_available_today` (no working hours, approved time off, or outside the service area) | `not_lead_tier`. For a P0 move this warning is advisory (coordinator may commit anyway); for p1/p2/p3 the same condition is the hard 409 SCHEDULE_MOVE_TECH_INFEASIBLE. 409 NEXT STEPS: SCHEDULE_MOVE_NOT_ELIGIBLE (job unconfirmed/unquoted/archived/completed — not movable) · SCHEDULE_MOVE_IN_PROGRESS (tech already executing — do not move) · SCHEDULE_MOVE_IN_PAST (pick a future time) · SCHEDULE_MOVE_OUTSIDE_WINDOW (landing time outside the customer-confirmed window — hard block; pick a time inside it) · SCHEDULE_MOVE_SLOT_OCCUPIED (landing window blocked by an immovable anchor — another tech/time) · SCHEDULE_MOVE_TECH_INFEASIBLE (non-P0 hard block: target tech not qualified/available — see the TECH_NOT_FEASIBLE warning reasons; change tech or time) · SCHEDULE_MOVE_MULTIDAY_UNSUPPORTED (multi-day jobs not movable v1) · SCHEDULE_MOVE_NO_WORKING_DAY (pick a working day) · SCHEDULE_MOVE_REQUIRES_FREE_SLOT (non-P0 moves may not displace — free capacity only, unless the owner enables allow_non_p0_displacement) · SCHEDULE_MOVE_CREW_UNSTAFFABLE (a crew slot has no feasible replacement at the new time — another time).
+        Computes (WITHOUT writing) the outcome of moving a confirmed job to a new time and/or technician: where it lands, every later job pushed back per `mode`, and the warnings the coordinator would accept (displaced jobs leaving their confirmed windows, overtime). Same technician = pure time move; different technician = manual reassign. Read-only — safe to call repeatedly while dragging; commit is a separate endpoint. See SCHEDULE_BOARD_DESIGN.md. Warning detail: a TECH_NOT_FEASIBLE warning carries `reason` (= `blockers[0].kind`) = `outside_service_area` | `missing_required_skills` | `not_lead_tier` | `no_working_day` | `on_time_off` | `off_shift` | `visit_too_long` | `cannot_arrive_in_time` (commute from the tech day-start location / shift start; `earliest_feasible_at`, RFC3339 UTC, is the first same-day time they CAN be on site — suggest it as the drop slot) | `not_available_today` (diagnosis unavailable). `blockers[]` names EVERY hard filter that failed, most-structural first — a client reading only `reason` still works. For a P0 move this warning is advisory (coordinator may commit anyway) and carries the SAME `blockers[]` a p1/p2/p3 move would get as the hard 409 SCHEDULE_MOVE_TECH_INFEASIBLE below. 409 NEXT STEPS: SCHEDULE_MOVE_NOT_ELIGIBLE (job unconfirmed/unquoted/archived/completed — `data.failed_precondition` names which) · SCHEDULE_MOVE_IN_PROGRESS (tech already executing — `data.fired_actions[]` lists the actions already fired; do not move) · SCHEDULE_MOVE_IN_PAST (pick a future time — its `data` carries `business_timezone`, the naive `start_at` and the `start_at_utc` it resolved to, which is what tells a caller whose own clock says otherwise where the difference came from) · SCHEDULE_MOVE_SLOT_OCCUPIED (landing window blocked by an immovable anchor; `data.conflicts[]` names it — another tech/time) · SCHEDULE_MOVE_TECH_INFEASIBLE (non-P0 hard block: target tech not qualified/available — its `data` carries `technician` (id+name), `reason` (same catalog as the TECH_NOT_FEASIBLE warning above), `blockers[]` (every cause, most-structural first) and, for `cannot_arrive_in_time`, `earliest_feasible_at` (RFC3339 UTC) to suggest as the drop slot; change tech or time) · SCHEDULE_MOVE_MULTIDAY_UNSUPPORTED (multi-day jobs not movable v1 — `data.session_count`/`data.session_dates`) · SCHEDULE_MOVE_NO_WORKING_DAY (`data.business_timezone`/`data.requested_weekday` — pick a working day, or set after_hours_override=true for a P0 whose technician has been phoned) · SCHEDULE_MOVE_REQUIRES_FREE_SLOT (non-P0 moves may not displace — `data.would_push[]` names the jobs that would be pushed, `data.allow_non_p0_displacement: false` names the setting that would permit it, unless the crew case sets `data.crew_never_displaces: true` instead — free capacity only) · SCHEDULE_MOVE_CREW_UNSTAFFABLE (a crew slot has no feasible replacement at the new time — another time). A landing outside the customer-confirmed window is NOT an error — it returns 200 with a MOVED_OUTSIDE_WINDOW warning (customer_window attached) that the coordinator overrides.
 
         :param id: Job request ID (UUID or short_code) (required)
         :type id: str
@@ -5223,7 +6204,7 @@ class JobRequestBusinessApi:
     ) -> ResponseEnvelope:
         """Fire quote (FIXED action — business)
 
-        Sends the quote: sets quoted_at + duration cols, advances pending_action to confirm_booking. Status stays `booking`.
+        Sends the quote: sets quoted_at + duration cols, advances pending_action to confirm_booking. Status stays `booking`. job_duration_minutes may be omitted when the job's job type has a default_duration_minutes: the type's default duration and buffers are used (a buffer you send still wins). This is how an automation or voice agent schedules work it cannot size. Before writing, checks that the customer will see at least one slot: the same engine as the customer slot picker runs over the windows the customer asked for with THIS quote's duration (working hours, service areas, time-off, existing bookings, crew coverage). If no slot exists the quote is refused with 409 JOB_REQUEST_QUOTE_NOT_SCHEDULABLE; data.reason says why (outside_working_hours, requested_windows_passed, outside_service_area, off_shift, on_time_off, missing_required_skills, no_technician_available, ...) and data.blocked_by counts the roster per blocker. Send force=true to schedule it anyway after agreeing a time with the customer.
 
         :param id: Job request ID (required)
         :type id: str
@@ -5264,6 +6245,7 @@ class JobRequestBusinessApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -5299,7 +6281,7 @@ class JobRequestBusinessApi:
     ) -> ApiResponse[ResponseEnvelope]:
         """Fire quote (FIXED action — business)
 
-        Sends the quote: sets quoted_at + duration cols, advances pending_action to confirm_booking. Status stays `booking`.
+        Sends the quote: sets quoted_at + duration cols, advances pending_action to confirm_booking. Status stays `booking`. job_duration_minutes may be omitted when the job's job type has a default_duration_minutes: the type's default duration and buffers are used (a buffer you send still wins). This is how an automation or voice agent schedules work it cannot size. Before writing, checks that the customer will see at least one slot: the same engine as the customer slot picker runs over the windows the customer asked for with THIS quote's duration (working hours, service areas, time-off, existing bookings, crew coverage). If no slot exists the quote is refused with 409 JOB_REQUEST_QUOTE_NOT_SCHEDULABLE; data.reason says why (outside_working_hours, requested_windows_passed, outside_service_area, off_shift, on_time_off, missing_required_skills, no_technician_available, ...) and data.blocked_by counts the roster per blocker. Send force=true to schedule it anyway after agreeing a time with the customer.
 
         :param id: Job request ID (required)
         :type id: str
@@ -5340,6 +6322,7 @@ class JobRequestBusinessApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -5375,7 +6358,7 @@ class JobRequestBusinessApi:
     ) -> RESTResponseType:
         """Fire quote (FIXED action — business)
 
-        Sends the quote: sets quoted_at + duration cols, advances pending_action to confirm_booking. Status stays `booking`.
+        Sends the quote: sets quoted_at + duration cols, advances pending_action to confirm_booking. Status stays `booking`. job_duration_minutes may be omitted when the job's job type has a default_duration_minutes: the type's default duration and buffers are used (a buffer you send still wins). This is how an automation or voice agent schedules work it cannot size. Before writing, checks that the customer will see at least one slot: the same engine as the customer slot picker runs over the windows the customer asked for with THIS quote's duration (working hours, service areas, time-off, existing bookings, crew coverage). If no slot exists the quote is refused with 409 JOB_REQUEST_QUOTE_NOT_SCHEDULABLE; data.reason says why (outside_working_hours, requested_windows_passed, outside_service_area, off_shift, on_time_off, missing_required_skills, no_technician_available, ...) and data.blocked_by counts the roster per blocker. Send force=true to schedule it anyway after agreeing a time with the customer.
 
         :param id: Job request ID (required)
         :type id: str
@@ -5416,6 +6399,7 @@ class JobRequestBusinessApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",

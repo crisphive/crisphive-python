@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from typing_extensions import Annotated
 from crisphive.models.customer_address_request import CustomerAddressRequest
@@ -31,12 +31,13 @@ class CustomerCreateRequest(BaseModel):
     address: Optional[CustomerAddressRequest] = Field(default=None, description="Postal address and coordinates.")
     email: Optional[StrictStr] = Field(default=None, description="Email address. Optional, but at least one of phone/email is required.")
     full_name: Annotated[str, Field(strict=True, max_length=255)] = Field(description="Customer's full name. Required; max 255 chars.")
-    phone: Optional[Annotated[str, Field(strict=True, max_length=20)]] = Field(default=None, description="Phone number. Optional, but at least one of phone/email is required; 10–20 chars.")
+    phone: Optional[Annotated[str, Field(strict=True, max_length=20)]] = Field(default=None, description="Phone number in E.164 international format: a leading `+` and the country code, e.g. `+16135550188`. A bare national number (`6135550188`) is REJECTED with PHONE_INVALID — there is no default region to guess the country from. Separators (spaces, dashes, parentheses) are stripped before validation. Optional, but at least one of phone/email is required; 10–20 chars.")
     preferred_technician_id: Optional[StrictStr] = Field(default=None, description="UUID of the technician this customer prefers. Must belong to this business.")
     service_area_id: Optional[StrictStr] = Field(default=None, description="UUID of the service area for this customer. Must belong to this business.")
+    sms_opt_in: Optional[StrictBool] = Field(default=None, description="SMS consent: set true ONLY when the customer explicitly agreed to receive SMS (e.g. ticked a non-pre-checked consent box, or gave verbal/written consent you keep a record of). SMS notifications are suppressed while false.")
     tier: Optional[StrictStr] = Field(default=None, description="Loyalty tier. Defaults to \"regular\" if omitted.")
     uid: Optional[Annotated[str, Field(strict=True, max_length=32)]] = Field(default=None, description="Your external reference for this customer (your own system's ID). Optional; max 32 chars.")
-    __properties: ClassVar[List[str]] = ["address", "email", "full_name", "phone", "preferred_technician_id", "service_area_id", "tier", "uid"]
+    __properties: ClassVar[List[str]] = ["address", "email", "full_name", "phone", "preferred_technician_id", "service_area_id", "sms_opt_in", "tier", "uid"]
 
     @field_validator('tier')
     def tier_validate_enum(cls, value):
@@ -108,6 +109,7 @@ class CustomerCreateRequest(BaseModel):
             "phone": obj.get("phone"),
             "preferred_technician_id": obj.get("preferred_technician_id"),
             "service_area_id": obj.get("service_area_id"),
+            "sms_opt_in": obj.get("sms_opt_in"),
             "tier": obj.get("tier"),
             "uid": obj.get("uid")
         })

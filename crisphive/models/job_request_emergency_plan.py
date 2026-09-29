@@ -21,6 +21,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from crisphive.models.job_request_move_warning import JobRequestMoveWarning
+from crisphive.models.job_request_reassign_fallback import JobRequestReassignFallback
 from crisphive.models.job_request_reschedule_day import JobRequestRescheduleDay
 from crisphive.models.job_request_reschedule_reassignment import JobRequestRescheduleReassignment
 from typing import Optional, Set
@@ -36,11 +37,12 @@ class JobRequestEmergencyPlan(BaseModel):
     emergency_job_id: Optional[StrictStr] = Field(default=None, description="ID of the inserted P0 job.")
     emergency_start: Optional[datetime] = Field(default=None, description="Emergency visit window start (UTC).")
     mode: Optional[StrictStr] = Field(default=None, description="Cascade mode the plan assumed (overtime | next_day).")
+    reassign_fallbacks: Optional[List[JobRequestReassignFallback]] = Field(default=None, description="ReassignFallbacks: one entry per displaced job that reassign mode could NOT re-staff, and therefore left in days[].moves[] to be rescheduled. Empty in reschedule mode. Read this INSTEAD of inferring \"nobody was free\" from an empty reassignments[] — the two are different states (no fallbacks + empty reassignments means nothing was displaced at all).")
     reassignments: Optional[List[JobRequestRescheduleReassignment]] = Field(default=None, description="Displaced jobs handed to an ALTERNATE technician at their original window (displacement_mode=reassign; empty otherwise). Jobs that could not be re-staffed remain in days/total_moves (reschedule fallback).")
     technician_id: Optional[StrictStr] = Field(default=None, description="Technician the emergency lands on.")
     total_moves: Optional[StrictInt] = Field(default=None, description="Number of displaced jobs pushed to a later window.")
-    warnings: Optional[List[JobRequestMoveWarning]] = Field(default=None, description="Non-blocking consequences the coordinator accepts by committing (TIME_OFF_OVERLAP per displaced job landing in the tech's approved leave).")
-    __properties: ClassVar[List[str]] = ["business_timezone", "days", "emergency_end", "emergency_job_id", "emergency_start", "mode", "reassignments", "technician_id", "total_moves", "warnings"]
+    warnings: Optional[List[JobRequestMoveWarning]] = Field(default=None, description="Non-blocking consequences the coordinator accepts by committing (TIME_OFF_OVERLAP per displaced job landing in the tech's approved leave, CALENDAR_OVERLAP per displaced job landing on a personal calendar event).")
+    __properties: ClassVar[List[str]] = ["business_timezone", "days", "emergency_end", "emergency_job_id", "emergency_start", "mode", "reassign_fallbacks", "reassignments", "technician_id", "total_moves", "warnings"]
 
     @field_validator('mode')
     def mode_validate_enum(cls, value):
@@ -98,6 +100,13 @@ class JobRequestEmergencyPlan(BaseModel):
                 if _item_days:
                     _items.append(_item_days.to_dict())
             _dict['days'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in reassign_fallbacks (list)
+        _items = []
+        if self.reassign_fallbacks:
+            for _item_reassign_fallbacks in self.reassign_fallbacks:
+                if _item_reassign_fallbacks:
+                    _items.append(_item_reassign_fallbacks.to_dict())
+            _dict['reassign_fallbacks'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in reassignments (list)
         _items = []
         if self.reassignments:
@@ -130,6 +139,7 @@ class JobRequestEmergencyPlan(BaseModel):
             "emergency_job_id": obj.get("emergency_job_id"),
             "emergency_start": obj.get("emergency_start"),
             "mode": obj.get("mode"),
+            "reassign_fallbacks": [JobRequestReassignFallback.from_dict(_item) for _item in obj["reassign_fallbacks"]] if obj.get("reassign_fallbacks") is not None else None,
             "reassignments": [JobRequestRescheduleReassignment.from_dict(_item) for _item in obj["reassignments"]] if obj.get("reassignments") is not None else None,
             "technician_id": obj.get("technician_id"),
             "total_moves": obj.get("total_moves"),

@@ -26,7 +26,7 @@ class JobRequestStatusSummary(BaseModel):
     """
     JobRequestStatusSummary
     """ # noqa: E501
-    display_name: Optional[StrictStr] = Field(default=None, description="Status display name, resolved to the request locale.")
+    display_name: Optional[StrictStr] = Field(default=None, description="Status display name as authored on the workflow (canonical; NOT resolved to the request locale).")
     key: Optional[StrictStr] = Field(default=None, description="Workflow status key (the business's workflow defines the set; first is always \"booking\", last always \"completed\").")
     __properties: ClassVar[List[str]] = ["display_name", "key"]
 

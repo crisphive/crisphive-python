@@ -30,6 +30,7 @@ class ServiceArea(BaseModel):
     boundary: Optional[Dict[str, Any]] = Field(default=None, description="GeoJSON polygon boundary of the area; null if no boundary was set.")
     business_id: Optional[StrictStr] = Field(default=None, description="UUID of the business that owns this service area.")
     city: Optional[StrictStr] = Field(default=None, description="City / locality for the area. Empty if unused.")
+    country: Optional[StrictStr] = Field(default=None, description="Country for the area. Empty if unused.")
     county: Optional[StrictStr] = Field(default=None, description="County for the area. Empty if unused.")
     created_at: Optional[datetime] = Field(default=None, description="When the service area was created (RFC3339).")
     description: Optional[StrictStr] = Field(default=None, description="Free-form description of the area. Empty if none was set.")
@@ -37,8 +38,9 @@ class ServiceArea(BaseModel):
     id: Optional[StrictStr] = Field(default=None, description="Service-area UUID — the stable identifier used in every service-area endpoint.")
     name: Optional[StrictStr] = Field(default=None, description="Service-area display name.")
     postal_code: Optional[StrictStr] = Field(default=None, description="Postal / ZIP code for the area. Empty if unused.")
+    state_province: Optional[StrictStr] = Field(default=None, description="State / province for the area. Empty if unused.")
     updated_at: Optional[datetime] = Field(default=None, description="When the service area was last modified (RFC3339).")
-    __properties: ClassVar[List[str]] = ["boundary", "business_id", "city", "county", "created_at", "description", "district", "id", "name", "postal_code", "updated_at"]
+    __properties: ClassVar[List[str]] = ["boundary", "business_id", "city", "country", "county", "created_at", "description", "district", "id", "name", "postal_code", "state_province", "updated_at"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -94,6 +96,7 @@ class ServiceArea(BaseModel):
             "boundary": obj.get("boundary"),
             "business_id": obj.get("business_id"),
             "city": obj.get("city"),
+            "country": obj.get("country"),
             "county": obj.get("county"),
             "created_at": obj.get("created_at"),
             "description": obj.get("description"),
@@ -101,6 +104,7 @@ class ServiceArea(BaseModel):
             "id": obj.get("id"),
             "name": obj.get("name"),
             "postal_code": obj.get("postal_code"),
+            "state_province": obj.get("state_province"),
             "updated_at": obj.get("updated_at")
         })
         return _obj

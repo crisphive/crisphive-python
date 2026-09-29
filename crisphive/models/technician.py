@@ -45,8 +45,10 @@ class Technician(BaseModel):
     join_date: Optional[date] = Field(default=None, description="Date the technician joined (YYYY-MM-DD); null if unset.")
     last_login_at: Optional[datetime] = Field(default=None, description="When the technician last logged in (RFC3339); null if never.")
     leads: Optional[List[TechnicianLeadRef]] = Field(default=None, description="Leads this technician is a buddy of (id + name).")
+    left_at: Optional[datetime] = Field(default=None, description="Set (RFC3339) only when the member RESIGNED themselves; null otherwise.  It is what separates the two meanings of `status: \"deactive\"`: with `left_at` set the member chose to leave (\"Đã nghỉ việc\"), with it null the business suspended them (\"Tạm khoá\"). Render them differently — the roster otherwise shows somebody who resigned exactly like somebody who was disciplined. Cleared when they are reactivated.")
     phone: Optional[StrictStr] = Field(default=None, description="Phone number in the form it was supplied; null if not set.")
-    role: Optional[StrictStr] = Field(default=None, description="Resolved role/group name (e.g. \"Technician\", \"Owner\").")
+    role: Optional[StrictStr] = Field(default=None, description="Resolved role/group name, localized to the request locale (e.g. \"Technician\", \"기술자\").")
+    role_key: Optional[StrictStr] = Field(default=None, description="Stable machine key of the role for SYSTEM groups; empty for custom (business-authored) groups. Compare role-specific client behavior against THIS, never against the localized role name.")
     service_areas: Optional[List[TechnicianServiceAreaRef]] = Field(default=None, description="Service areas this technician is assigned to (id + name).")
     start_location_lat: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start-location latitude in decimal degrees; null if no coordinates are saved.")
     start_location_long: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Start-location longitude in decimal degrees; null if no coordinates are saved.")
@@ -55,7 +57,7 @@ class Technician(BaseModel):
     updated_at: Optional[datetime] = Field(default=None, description="When the technician record was last modified (RFC3339).")
     user_id: Optional[StrictStr] = Field(default=None, description="UUID of the underlying user account.")
     vehicle_ids: Optional[List[StrictStr]] = Field(default=None, description="UUIDs of the vehicles this technician uses.")
-    __properties: ClassVar[List[str]] = ["address", "assignment_tier", "buddy_ids", "business_group_id", "business_id", "created_at", "deleted_at", "email", "full_name", "id", "job_title", "join_date", "last_login_at", "leads", "phone", "role", "service_areas", "start_location_lat", "start_location_long", "start_location_type", "status", "updated_at", "user_id", "vehicle_ids"]
+    __properties: ClassVar[List[str]] = ["address", "assignment_tier", "buddy_ids", "business_group_id", "business_id", "created_at", "deleted_at", "email", "full_name", "id", "job_title", "join_date", "last_login_at", "leads", "left_at", "phone", "role", "role_key", "service_areas", "start_location_lat", "start_location_long", "start_location_type", "status", "updated_at", "user_id", "vehicle_ids"]
 
     @field_validator('assignment_tier')
     def assignment_tier_validate_enum(cls, value):
@@ -65,6 +67,16 @@ class Technician(BaseModel):
 
         if value not in set(['lead', 'buddy', 'float']):
             raise ValueError("must be one of enum values ('lead', 'buddy', 'float')")
+        return value
+
+    @field_validator('role_key')
+    def role_key_validate_enum(cls, value):
+        """Validates the enum"""
+        if value is None:
+            return value
+
+        if value not in set(['owner', 'administrator', 'booking_coordinator', 'supervisor', 'technician']):
+            raise ValueError("must be one of enum values ('owner', 'administrator', 'booking_coordinator', 'supervisor', 'technician')")
         return value
 
     @field_validator('start_location_type')
@@ -159,8 +171,10 @@ class Technician(BaseModel):
             "join_date": obj.get("join_date"),
             "last_login_at": obj.get("last_login_at"),
             "leads": [TechnicianLeadRef.from_dict(_item) for _item in obj["leads"]] if obj.get("leads") is not None else None,
+            "left_at": obj.get("left_at"),
             "phone": obj.get("phone"),
             "role": obj.get("role"),
+            "role_key": obj.get("role_key"),
             "service_areas": [TechnicianServiceAreaRef.from_dict(_item) for _item in obj["service_areas"]] if obj.get("service_areas") is not None else None,
             "start_location_lat": obj.get("start_location_lat"),
             "start_location_long": obj.get("start_location_long"),

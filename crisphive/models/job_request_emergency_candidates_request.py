@@ -17,7 +17,8 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from typing_extensions import Annotated
 from typing import Optional, Set
@@ -27,11 +28,12 @@ class JobRequestEmergencyCandidatesRequest(BaseModel):
     """
     JobRequestEmergencyCandidatesRequest
     """ # noqa: E501
+    after_hours_override: Optional[StrictBool] = Field(default=None, description="Place this P0 outside working hours / approved time-off — you have phoned the technician and they agreed. Drops the non-working-day rejection; the response then carries an AFTER_HOURS warning. Double-booking, service area, required skills and the lead-tier rule still reject.")
     emergency_job_id: StrictStr = Field(description="ID of the P0 job to place.")
     limit: Optional[Annotated[int, Field(le=10, strict=True, ge=1)]] = Field(default=None, description="Max candidates to return (default 5, max 10).")
     mode: StrictStr = Field(description="Cascade mode each candidate's displacement preview assumes: overtime = displaced jobs stay same-day; next_day = overflow rolls to the next working day.")
-    start_at: StrictStr = Field(description="Desired start — business-local naive datetime, no offset. Must be in the future.")
-    __properties: ClassVar[List[str]] = ["emergency_job_id", "limit", "mode", "start_at"]
+    start_at: datetime = Field(description="Desired start — business-local wall clock. Seconds may be omitted and a space may replace the T; an offset is accepted only when it agrees with the business timezone (a disagreeing one is refused with JOB_REQUEST_INVALID_INPUT rather than guessed). Must be in the future.")
+    __properties: ClassVar[List[str]] = ["after_hours_override", "emergency_job_id", "limit", "mode", "start_at"]
 
     @field_validator('mode')
     def mode_validate_enum(cls, value):
@@ -91,6 +93,7 @@ class JobRequestEmergencyCandidatesRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "after_hours_override": obj.get("after_hours_override"),
             "emergency_job_id": obj.get("emergency_job_id"),
             "limit": obj.get("limit"),
             "mode": obj.get("mode"),

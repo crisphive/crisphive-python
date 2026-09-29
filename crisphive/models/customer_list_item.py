@@ -18,7 +18,7 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -32,11 +32,12 @@ class CustomerListItem(BaseModel):
     id: Optional[StrictStr] = Field(default=None, description="Customer UUID.")
     last_request_at: Optional[datetime] = Field(default=None, description="When the customer last booked, or null if never (RFC3339).")
     request_count: Optional[StrictInt] = Field(default=None, description="Total number of job requests booked.")
+    sms_opt_in: Optional[StrictBool] = Field(default=None, description="True when the customer has explicitly consented to receive SMS.")
     status: Optional[StrictStr] = Field(default=None, description="Lifecycle status.")
     tier: Optional[StrictStr] = Field(default=None, description="Loyalty tier.")
     uid: Optional[StrictStr] = Field(default=None, description="Your external reference for this customer. Optional.")
     updated_at: Optional[datetime] = Field(default=None, description="When this record was last modified (RFC3339).")
-    __properties: ClassVar[List[str]] = ["deleted_at", "full_name", "id", "last_request_at", "request_count", "status", "tier", "uid", "updated_at"]
+    __properties: ClassVar[List[str]] = ["deleted_at", "full_name", "id", "last_request_at", "request_count", "sms_opt_in", "status", "tier", "uid", "updated_at"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
@@ -114,6 +115,7 @@ class CustomerListItem(BaseModel):
             "id": obj.get("id"),
             "last_request_at": obj.get("last_request_at"),
             "request_count": obj.get("request_count"),
+            "sms_opt_in": obj.get("sms_opt_in"),
             "status": obj.get("status"),
             "tier": obj.get("tier"),
             "uid": obj.get("uid"),

@@ -19,11 +19,16 @@ from typing_extensions import Annotated
 from pydantic import Field, StrictBool, StrictInt, StrictStr
 from typing import Optional
 from typing_extensions import Annotated
+from crisphive.models.create_skill200_response import CreateSkill200Response
+from crisphive.models.create_skill_category200_response import CreateSkillCategory200Response
 from crisphive.models.list_skill_categories200_response import ListSkillCategories200Response
 from crisphive.models.list_skills200_response import ListSkills200Response
 from crisphive.models.list_skills_by_category200_response import ListSkillsByCategory200Response
 from crisphive.models.list_technician_skills200_response import ListTechnicianSkills200Response
 from crisphive.models.response_envelope import ResponseEnvelope
+from crisphive.models.skill_category_create_request import SkillCategoryCreateRequest
+from crisphive.models.skill_create_request import SkillCreateRequest
+from crisphive.models.skill_update_request import SkillUpdateRequest
 from crisphive.models.technician_skills_request import TechnicianSkillsRequest
 
 from crisphive.api_client import ApiClient, RequestSerialized
@@ -42,6 +47,1190 @@ class BusinessSkillApi:
         if api_client is None:
             api_client = ApiClient.get_default()
         self.api_client = api_client
+
+
+    @validate_call
+    def create_skill(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill category ID (UUID)")],
+        skill_create_request: Annotated[SkillCreateRequest, Field(description="Skill details (name max 200 chars, description max 4000 chars)")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> CreateSkill200Response:
+        """Create a skill
+
+        Creates a skill under the given category. New skills are active by default. Skill names must be unique within their category.
+
+        :param id: Skill category ID (UUID) (required)
+        :type id: str
+        :param skill_create_request: Skill details (name max 200 chars, description max 4000 chars) (required)
+        :type skill_create_request: SkillCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_skill_serialize(
+            id=id,
+            skill_create_request=skill_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateSkill200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def create_skill_with_http_info(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill category ID (UUID)")],
+        skill_create_request: Annotated[SkillCreateRequest, Field(description="Skill details (name max 200 chars, description max 4000 chars)")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[CreateSkill200Response]:
+        """Create a skill
+
+        Creates a skill under the given category. New skills are active by default. Skill names must be unique within their category.
+
+        :param id: Skill category ID (UUID) (required)
+        :type id: str
+        :param skill_create_request: Skill details (name max 200 chars, description max 4000 chars) (required)
+        :type skill_create_request: SkillCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_skill_serialize(
+            id=id,
+            skill_create_request=skill_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateSkill200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def create_skill_without_preload_content(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill category ID (UUID)")],
+        skill_create_request: Annotated[SkillCreateRequest, Field(description="Skill details (name max 200 chars, description max 4000 chars)")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Create a skill
+
+        Creates a skill under the given category. New skills are active by default. Skill names must be unique within their category.
+
+        :param id: Skill category ID (UUID) (required)
+        :type id: str
+        :param skill_create_request: Skill details (name max 200 chars, description max 4000 chars) (required)
+        :type skill_create_request: SkillCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_skill_serialize(
+            id=id,
+            skill_create_request=skill_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateSkill200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _create_skill_serialize(
+        self,
+        id,
+        skill_create_request,
+        idempotency_key,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if id is not None:
+            _path_params['id'] = id
+        # process the query parameters
+        # process the header parameters
+        if idempotency_key is not None:
+            _header_params['Idempotency-Key'] = idempotency_key
+        # process the form parameters
+        # process the body parameter
+        if skill_create_request is not None:
+            _body_params = skill_create_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/skill-categories/{id}/skills',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def create_skill_category(
+        self,
+        skill_category_create_request: Annotated[SkillCategoryCreateRequest, Field(description="Category name (max 200 chars)")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> CreateSkillCategory200Response:
+        """Create a skill category
+
+        Creates a skill category for the current business. Categories group skills (e.g. \"Plumbing\", \"Electrical\"). Names must be unique within a business.
+
+        :param skill_category_create_request: Category name (max 200 chars) (required)
+        :type skill_category_create_request: SkillCategoryCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_skill_category_serialize(
+            skill_category_create_request=skill_category_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateSkillCategory200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def create_skill_category_with_http_info(
+        self,
+        skill_category_create_request: Annotated[SkillCategoryCreateRequest, Field(description="Category name (max 200 chars)")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[CreateSkillCategory200Response]:
+        """Create a skill category
+
+        Creates a skill category for the current business. Categories group skills (e.g. \"Plumbing\", \"Electrical\"). Names must be unique within a business.
+
+        :param skill_category_create_request: Category name (max 200 chars) (required)
+        :type skill_category_create_request: SkillCategoryCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_skill_category_serialize(
+            skill_category_create_request=skill_category_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateSkillCategory200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def create_skill_category_without_preload_content(
+        self,
+        skill_category_create_request: Annotated[SkillCategoryCreateRequest, Field(description="Category name (max 200 chars)")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Create a skill category
+
+        Creates a skill category for the current business. Categories group skills (e.g. \"Plumbing\", \"Electrical\"). Names must be unique within a business.
+
+        :param skill_category_create_request: Category name (max 200 chars) (required)
+        :type skill_category_create_request: SkillCategoryCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_skill_category_serialize(
+            skill_category_create_request=skill_category_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateSkillCategory200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _create_skill_category_serialize(
+        self,
+        skill_category_create_request,
+        idempotency_key,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        # process the header parameters
+        if idempotency_key is not None:
+            _header_params['Idempotency-Key'] = idempotency_key
+        # process the form parameters
+        # process the body parameter
+        if skill_category_create_request is not None:
+            _body_params = skill_category_create_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/skill-categories',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def delete_skill(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill ID (UUID)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ResponseEnvelope:
+        """Delete a skill
+
+        Permanently deletes a skill. Returns SKILL_HAS_MEMBERS (409) if any active technicians are still assigned — unassign all technicians first.
+
+        :param id: Skill ID (UUID) (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_skill_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def delete_skill_with_http_info(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill ID (UUID)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[ResponseEnvelope]:
+        """Delete a skill
+
+        Permanently deletes a skill. Returns SKILL_HAS_MEMBERS (409) if any active technicians are still assigned — unassign all technicians first.
+
+        :param id: Skill ID (UUID) (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_skill_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def delete_skill_without_preload_content(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill ID (UUID)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Delete a skill
+
+        Permanently deletes a skill. Returns SKILL_HAS_MEMBERS (409) if any active technicians are still assigned — unassign all technicians first.
+
+        :param id: Skill ID (UUID) (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_skill_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _delete_skill_serialize(
+        self,
+        id,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if id is not None:
+            _path_params['id'] = id
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='DELETE',
+            resource_path='/skills/{id}',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def delete_skill_category(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill category ID (UUID)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ResponseEnvelope:
+        """Delete a skill category
+
+        Permanently deletes a skill category. Returns SKILL_CATEGORY_NOT_EMPTY (409) if any skills still belong to the category — remove or move all skills first.
+
+        :param id: Skill category ID (UUID) (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_skill_category_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def delete_skill_category_with_http_info(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill category ID (UUID)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[ResponseEnvelope]:
+        """Delete a skill category
+
+        Permanently deletes a skill category. Returns SKILL_CATEGORY_NOT_EMPTY (409) if any skills still belong to the category — remove or move all skills first.
+
+        :param id: Skill category ID (UUID) (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_skill_category_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def delete_skill_category_without_preload_content(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill category ID (UUID)")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Delete a skill category
+
+        Permanently deletes a skill category. Returns SKILL_CATEGORY_NOT_EMPTY (409) if any skills still belong to the category — remove or move all skills first.
+
+        :param id: Skill category ID (UUID) (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_skill_category_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _delete_skill_category_serialize(
+        self,
+        id,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if id is not None:
+            _path_params['id'] = id
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='DELETE',
+            resource_path='/skill-categories/{id}',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
 
 
     @validate_call
@@ -105,6 +1294,7 @@ class BusinessSkillApi:
             '200': "ListSkillCategories200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -179,6 +1369,7 @@ class BusinessSkillApi:
             '200': "ListSkillCategories200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -253,6 +1444,7 @@ class BusinessSkillApi:
             '200': "ListSkillCategories200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -385,6 +1577,7 @@ class BusinessSkillApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListSkills200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -450,6 +1643,7 @@ class BusinessSkillApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListSkills200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -515,6 +1709,7 @@ class BusinessSkillApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListSkills200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -650,6 +1845,7 @@ class BusinessSkillApi:
             '200': "ListSkillsByCategory200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -729,6 +1925,7 @@ class BusinessSkillApi:
             '200': "ListSkillsByCategory200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -808,6 +2005,7 @@ class BusinessSkillApi:
             '200': "ListSkillsByCategory200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -961,6 +2159,7 @@ class BusinessSkillApi:
             '200': "ListTechnicianSkills200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1044,6 +2243,7 @@ class BusinessSkillApi:
             '200': "ListTechnicianSkills200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1127,6 +2327,7 @@ class BusinessSkillApi:
             '200': "ListTechnicianSkills200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1277,6 +2478,7 @@ class BusinessSkillApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -1353,6 +2555,7 @@ class BusinessSkillApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -1429,6 +2632,7 @@ class BusinessSkillApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -1505,6 +2709,313 @@ class BusinessSkillApi:
         return self.api_client.param_serialize(
             method='PATCH',
             resource_path='/technicians/{id}/skills',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def update_skill(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill ID (UUID)")],
+        skill_update_request: Annotated[SkillUpdateRequest, Field(description="Fields to update")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ResponseEnvelope:
+        """Update a skill
+
+        Updates a skill's name, description, and/or active status. `is_active` is optional — omit the field entirely to keep the current value; send `false` to deactivate or `true` to reactivate. Deactivating a skill prevents new technician assignments but does not remove existing ones.
+
+        :param id: Skill ID (UUID) (required)
+        :type id: str
+        :param skill_update_request: Fields to update (required)
+        :type skill_update_request: SkillUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_skill_serialize(
+            id=id,
+            skill_update_request=skill_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def update_skill_with_http_info(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill ID (UUID)")],
+        skill_update_request: Annotated[SkillUpdateRequest, Field(description="Fields to update")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[ResponseEnvelope]:
+        """Update a skill
+
+        Updates a skill's name, description, and/or active status. `is_active` is optional — omit the field entirely to keep the current value; send `false` to deactivate or `true` to reactivate. Deactivating a skill prevents new technician assignments but does not remove existing ones.
+
+        :param id: Skill ID (UUID) (required)
+        :type id: str
+        :param skill_update_request: Fields to update (required)
+        :type skill_update_request: SkillUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_skill_serialize(
+            id=id,
+            skill_update_request=skill_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def update_skill_without_preload_content(
+        self,
+        id: Annotated[StrictStr, Field(description="Skill ID (UUID)")],
+        skill_update_request: Annotated[SkillUpdateRequest, Field(description="Fields to update")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Update a skill
+
+        Updates a skill's name, description, and/or active status. `is_active` is optional — omit the field entirely to keep the current value; send `false` to deactivate or `true` to reactivate. Deactivating a skill prevents new technician assignments but does not remove existing ones.
+
+        :param id: Skill ID (UUID) (required)
+        :type id: str
+        :param skill_update_request: Fields to update (required)
+        :type skill_update_request: SkillUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_skill_serialize(
+            id=id,
+            skill_update_request=skill_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _update_skill_serialize(
+        self,
+        id,
+        skill_update_request,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if id is not None:
+            _path_params['id'] = id
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+        if skill_update_request is not None:
+            _body_params = skill_update_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='PUT',
+            resource_path='/skills/{id}',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,

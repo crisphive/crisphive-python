@@ -19,8 +19,12 @@ from typing_extensions import Annotated
 from pydantic import Field, StrictStr
 from typing import Optional
 from typing_extensions import Annotated
+from crisphive.models.create_job_type200_response import CreateJobType200Response
 from crisphive.models.get_job_type200_response import GetJobType200Response
+from crisphive.models.job_type_create_request import JobTypeCreateRequest
+from crisphive.models.job_type_update_request import JobTypeUpdateRequest
 from crisphive.models.list_job_types200_response import ListJobTypes200Response
+from crisphive.models.response_envelope import ResponseEnvelope
 
 from crisphive.api_client import ApiClient, RequestSerialized
 from crisphive.api_response import ApiResponse
@@ -38,6 +42,583 @@ class JobTypesApi:
         if api_client is None:
             api_client = ApiClient.get_default()
         self.api_client = api_client
+
+
+    @validate_call
+    def create_job_type(
+        self,
+        job_type_create_request: Annotated[JobTypeCreateRequest, Field(description="Job type")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> CreateJobType200Response:
+        """Add a job type to the catalog
+
+        Creates a kind of work customers can book, such as \"Annual boiler service\" or \"Drain unblocking\". Job types classify bookings: createJobRequest takes an optional `job_type_id` from this catalog and the job keeps the type's name as it was at booking time.  `name` is the only required field and must be unique in the business (JOB_TYPE_DUPLICATE). `status` defaults to active. An inactive type stays in the catalog but cannot be chosen for new job requests; use that rather than deleting a type you may revive.  Send an Idempotency-Key header (the `idempotency_key` argument over MCP) so a retried call replays the original response instead of creating a duplicate type.  Optional default_duration_minutes (+ default_mobilization_minutes / default_demobilization_minutes) set how long this kind of work usually takes: quoteJobRequest uses them when it is sent no job_duration_minutes, so an automation or voice agent can schedule the job without knowing the length. A buffer needs a duration (JOB_TYPE_INVALID_DEFAULT_DURATION).  This defines the catalog, not a booking. To book actual work use createJobRequest and reference the job type there.
+
+        :param job_type_create_request: Job type (required)
+        :type job_type_create_request: JobTypeCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_job_type_serialize(
+            job_type_create_request=job_type_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateJobType200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def create_job_type_with_http_info(
+        self,
+        job_type_create_request: Annotated[JobTypeCreateRequest, Field(description="Job type")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[CreateJobType200Response]:
+        """Add a job type to the catalog
+
+        Creates a kind of work customers can book, such as \"Annual boiler service\" or \"Drain unblocking\". Job types classify bookings: createJobRequest takes an optional `job_type_id` from this catalog and the job keeps the type's name as it was at booking time.  `name` is the only required field and must be unique in the business (JOB_TYPE_DUPLICATE). `status` defaults to active. An inactive type stays in the catalog but cannot be chosen for new job requests; use that rather than deleting a type you may revive.  Send an Idempotency-Key header (the `idempotency_key` argument over MCP) so a retried call replays the original response instead of creating a duplicate type.  Optional default_duration_minutes (+ default_mobilization_minutes / default_demobilization_minutes) set how long this kind of work usually takes: quoteJobRequest uses them when it is sent no job_duration_minutes, so an automation or voice agent can schedule the job without knowing the length. A buffer needs a duration (JOB_TYPE_INVALID_DEFAULT_DURATION).  This defines the catalog, not a booking. To book actual work use createJobRequest and reference the job type there.
+
+        :param job_type_create_request: Job type (required)
+        :type job_type_create_request: JobTypeCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_job_type_serialize(
+            job_type_create_request=job_type_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateJobType200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def create_job_type_without_preload_content(
+        self,
+        job_type_create_request: Annotated[JobTypeCreateRequest, Field(description="Job type")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Add a job type to the catalog
+
+        Creates a kind of work customers can book, such as \"Annual boiler service\" or \"Drain unblocking\". Job types classify bookings: createJobRequest takes an optional `job_type_id` from this catalog and the job keeps the type's name as it was at booking time.  `name` is the only required field and must be unique in the business (JOB_TYPE_DUPLICATE). `status` defaults to active. An inactive type stays in the catalog but cannot be chosen for new job requests; use that rather than deleting a type you may revive.  Send an Idempotency-Key header (the `idempotency_key` argument over MCP) so a retried call replays the original response instead of creating a duplicate type.  Optional default_duration_minutes (+ default_mobilization_minutes / default_demobilization_minutes) set how long this kind of work usually takes: quoteJobRequest uses them when it is sent no job_duration_minutes, so an automation or voice agent can schedule the job without knowing the length. A buffer needs a duration (JOB_TYPE_INVALID_DEFAULT_DURATION).  This defines the catalog, not a booking. To book actual work use createJobRequest and reference the job type there.
+
+        :param job_type_create_request: Job type (required)
+        :type job_type_create_request: JobTypeCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_job_type_serialize(
+            job_type_create_request=job_type_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateJobType200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _create_job_type_serialize(
+        self,
+        job_type_create_request,
+        idempotency_key,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        # process the header parameters
+        if idempotency_key is not None:
+            _header_params['Idempotency-Key'] = idempotency_key
+        # process the form parameters
+        # process the body parameter
+        if job_type_create_request is not None:
+            _body_params = job_type_create_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/job-types',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def delete_job_type(
+        self,
+        id: Annotated[StrictStr, Field(description="Job Type ID")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ResponseEnvelope:
+        """Remove a job type from the catalog
+
+        Soft-deletes the entry: it disappears from the catalog and can no longer be selected for new bookings. Jobs already booked against it are unaffected and keep showing the name they were booked with.  Prefer updateJobType with `status=inactive` in almost every case: it has the same effect on the booking form and is trivially reversible. Delete is for a type created in error or one that will never return.  Rows the platform ships with (`is_system=true`) cannot be deleted and are refused with JOB_TYPE_SYSTEM_READ_ONLY.
+
+        :param id: Job Type ID (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_job_type_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def delete_job_type_with_http_info(
+        self,
+        id: Annotated[StrictStr, Field(description="Job Type ID")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[ResponseEnvelope]:
+        """Remove a job type from the catalog
+
+        Soft-deletes the entry: it disappears from the catalog and can no longer be selected for new bookings. Jobs already booked against it are unaffected and keep showing the name they were booked with.  Prefer updateJobType with `status=inactive` in almost every case: it has the same effect on the booking form and is trivially reversible. Delete is for a type created in error or one that will never return.  Rows the platform ships with (`is_system=true`) cannot be deleted and are refused with JOB_TYPE_SYSTEM_READ_ONLY.
+
+        :param id: Job Type ID (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_job_type_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def delete_job_type_without_preload_content(
+        self,
+        id: Annotated[StrictStr, Field(description="Job Type ID")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Remove a job type from the catalog
+
+        Soft-deletes the entry: it disappears from the catalog and can no longer be selected for new bookings. Jobs already booked against it are unaffected and keep showing the name they were booked with.  Prefer updateJobType with `status=inactive` in almost every case: it has the same effect on the booking form and is trivially reversible. Delete is for a type created in error or one that will never return.  Rows the platform ships with (`is_system=true`) cannot be deleted and are refused with JOB_TYPE_SYSTEM_READ_ONLY.
+
+        :param id: Job Type ID (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_job_type_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _delete_job_type_serialize(
+        self,
+        id,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if id is not None:
+            _path_params['id'] = id
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='DELETE',
+            resource_path='/job-types/{id}',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
 
 
     @validate_call
@@ -96,6 +677,7 @@ class JobTypesApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetJobType200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -166,6 +748,7 @@ class JobTypesApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetJobType200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -236,6 +819,7 @@ class JobTypesApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetJobType200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -367,6 +951,7 @@ class JobTypesApi:
             '200': "ListJobTypes200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -437,6 +1022,7 @@ class JobTypesApi:
             '200': "ListJobTypes200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -507,6 +1093,7 @@ class JobTypesApi:
             '200': "ListJobTypes200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -567,6 +1154,313 @@ class JobTypesApi:
         return self.api_client.param_serialize(
             method='GET',
             resource_path='/job-types',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def update_job_type(
+        self,
+        id: Annotated[StrictStr, Field(description="Job Type ID")],
+        job_type_update_request: Annotated[JobTypeUpdateRequest, Field(description="Job type")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ResponseEnvelope:
+        """Rename a job type or change its availability
+
+        Edits a catalog entry in place. A rename applies to NEW bookings only: every job stores the job-type name it was booked with, so existing and completed jobs keep their original label.  Partial update: omit a field to keep it. `name` rejects \"\" because a type must stay identifiable, and must stay unique (JOB_TYPE_DUPLICATE). Setting `status` to inactive is the reversible way to take a type off the booking form; inactive types are refused for new job requests.  Default quote bundle: default_duration_minutes / default_mobilization_minutes / default_demobilization_minutes follow the same partial rule; omit to keep, 0 to clear, a value to set. Clearing the duration while a buffer stays is refused (JOB_TYPE_INVALID_DEFAULT_DURATION).  Rows the platform ships with (`is_system=true`, e.g. the default \"General\" type) keep their name and status read-only (JOB_TYPE_SYSTEM_READ_ONLY); their default quote bundle IS editable. Create your own type if you need different wording.
+
+        :param id: Job Type ID (required)
+        :type id: str
+        :param job_type_update_request: Job type (required)
+        :type job_type_update_request: JobTypeUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_job_type_serialize(
+            id=id,
+            job_type_update_request=job_type_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def update_job_type_with_http_info(
+        self,
+        id: Annotated[StrictStr, Field(description="Job Type ID")],
+        job_type_update_request: Annotated[JobTypeUpdateRequest, Field(description="Job type")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[ResponseEnvelope]:
+        """Rename a job type or change its availability
+
+        Edits a catalog entry in place. A rename applies to NEW bookings only: every job stores the job-type name it was booked with, so existing and completed jobs keep their original label.  Partial update: omit a field to keep it. `name` rejects \"\" because a type must stay identifiable, and must stay unique (JOB_TYPE_DUPLICATE). Setting `status` to inactive is the reversible way to take a type off the booking form; inactive types are refused for new job requests.  Default quote bundle: default_duration_minutes / default_mobilization_minutes / default_demobilization_minutes follow the same partial rule; omit to keep, 0 to clear, a value to set. Clearing the duration while a buffer stays is refused (JOB_TYPE_INVALID_DEFAULT_DURATION).  Rows the platform ships with (`is_system=true`, e.g. the default \"General\" type) keep their name and status read-only (JOB_TYPE_SYSTEM_READ_ONLY); their default quote bundle IS editable. Create your own type if you need different wording.
+
+        :param id: Job Type ID (required)
+        :type id: str
+        :param job_type_update_request: Job type (required)
+        :type job_type_update_request: JobTypeUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_job_type_serialize(
+            id=id,
+            job_type_update_request=job_type_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def update_job_type_without_preload_content(
+        self,
+        id: Annotated[StrictStr, Field(description="Job Type ID")],
+        job_type_update_request: Annotated[JobTypeUpdateRequest, Field(description="Job type")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Rename a job type or change its availability
+
+        Edits a catalog entry in place. A rename applies to NEW bookings only: every job stores the job-type name it was booked with, so existing and completed jobs keep their original label.  Partial update: omit a field to keep it. `name` rejects \"\" because a type must stay identifiable, and must stay unique (JOB_TYPE_DUPLICATE). Setting `status` to inactive is the reversible way to take a type off the booking form; inactive types are refused for new job requests.  Default quote bundle: default_duration_minutes / default_mobilization_minutes / default_demobilization_minutes follow the same partial rule; omit to keep, 0 to clear, a value to set. Clearing the duration while a buffer stays is refused (JOB_TYPE_INVALID_DEFAULT_DURATION).  Rows the platform ships with (`is_system=true`, e.g. the default \"General\" type) keep their name and status read-only (JOB_TYPE_SYSTEM_READ_ONLY); their default quote bundle IS editable. Create your own type if you need different wording.
+
+        :param id: Job Type ID (required)
+        :type id: str
+        :param job_type_update_request: Job type (required)
+        :type job_type_update_request: JobTypeUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_job_type_serialize(
+            id=id,
+            job_type_update_request=job_type_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _update_job_type_serialize(
+        self,
+        id,
+        job_type_update_request,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if id is not None:
+            _path_params['id'] = id
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+        if job_type_update_request is not None:
+            _body_params = job_type_update_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='PUT',
+            resource_path='/job-types/{id}',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,

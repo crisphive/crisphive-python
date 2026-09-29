@@ -18,8 +18,8 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List, Optional, Union
 from crisphive.models.job_request_action_audit_entry import JobRequestActionAuditEntry
 from crisphive.models.job_request_action_summary import JobRequestActionSummary
 from crisphive.models.job_request_address_summary import JobRequestAddressSummary
@@ -57,6 +57,7 @@ class JobRequest(BaseModel):
     customer_url: Optional[StrictStr] = Field(default=None, description="Ready-to-share customer URL embedding the magic token. Omitted if not issued.")
     deleted_at: Optional[datetime] = Field(default=None, description="When the job was soft-deleted (UTC); omitted unless deleted.")
     description: Optional[StrictStr] = Field(default=None, description="Free-text job description; null if none.")
+    distance_km: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Driving distance from the technician's start location to the job site, in kilometres. Detail reads only — omitted when unknown. Named _km to match distance_km on the nearby-technician and emergency-candidate DTOs.")
     id: Optional[StrictStr] = Field(default=None, description="Job request UUID.")
     job_type_id: Optional[StrictStr] = Field(default=None, description="UUID of the job type, or null if unclassified.")
     job_type_name: Optional[StrictStr] = Field(default=None, description="Job type display name (resolved to locale). Omitted if unclassified.")
@@ -74,7 +75,7 @@ class JobRequest(BaseModel):
     updated_at: Optional[datetime] = Field(default=None, description="When the job was last modified (UTC).")
     workflow_id: Optional[StrictStr] = Field(default=None, description="UUID of the workflow snapshot driving this job's state machine.")
     workflow_name: Optional[StrictStr] = Field(default=None, description="Workflow display name.")
-    __properties: ClassVar[List[str]] = ["action_audit", "address", "archive", "assigned_vehicle", "assignment", "attention", "business_id", "completed_at", "completed_by_user_id", "created_at", "crew", "current_status", "customer", "customer_url", "deleted_at", "description", "id", "job_type_id", "job_type_name", "next_actions", "priority", "quote", "rating", "schedule", "short_code", "skills", "sla_deadline", "sla_escalated_at", "sla_warned_at", "status_version", "updated_at", "workflow_id", "workflow_name"]
+    __properties: ClassVar[List[str]] = ["action_audit", "address", "archive", "assigned_vehicle", "assignment", "attention", "business_id", "completed_at", "completed_by_user_id", "created_at", "crew", "current_status", "customer", "customer_url", "deleted_at", "description", "distance_km", "id", "job_type_id", "job_type_name", "next_actions", "priority", "quote", "rating", "schedule", "short_code", "skills", "sla_deadline", "sla_escalated_at", "sla_warned_at", "status_version", "updated_at", "workflow_id", "workflow_name"]
 
     @field_validator('priority')
     def priority_validate_enum(cls, value):
@@ -216,6 +217,7 @@ class JobRequest(BaseModel):
             "customer_url": obj.get("customer_url"),
             "deleted_at": obj.get("deleted_at"),
             "description": obj.get("description"),
+            "distance_km": obj.get("distance_km"),
             "id": obj.get("id"),
             "job_type_id": obj.get("job_type_id"),
             "job_type_name": obj.get("job_type_name"),

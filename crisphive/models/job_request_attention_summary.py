@@ -37,8 +37,8 @@ class JobRequestAttentionSummary(BaseModel):
         if value is None:
             return value
 
-        if value not in set(['assignment_broken']):
-            raise ValueError("must be one of enum values ('assignment_broken')")
+        if value not in set(['assignment_broken', 'calendar_conflict']):
+            raise ValueError("must be one of enum values ('assignment_broken', 'calendar_conflict')")
         return value
 
     model_config = ConfigDict(

@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from typing_extensions import Annotated
 from crisphive.models.customer_address_request import CustomerAddressRequest
@@ -28,17 +28,18 @@ class CustomerUpdateRequest(BaseModel):
     """
     CustomerUpdateRequest
     """ # noqa: E501
-    address: Optional[CustomerAddressRequest] = Field(default=None, description="Postal address and coordinates.")
-    email: Optional[StrictStr] = Field(default=None, description="Email address.")
-    full_name: Annotated[str, Field(strict=True, max_length=255)] = Field(description="Customer's full name. Required; max 255 chars.")
-    notes: Optional[Annotated[str, Field(strict=True, max_length=4000)]] = Field(default=None, description="Free-form internal notes about the customer; max 4000 chars.")
-    phone: Optional[Annotated[str, Field(strict=True, max_length=20)]] = Field(default=None, description="Phone number. 10–20 chars.")
-    preferred_technician_id: Optional[StrictStr] = Field(default=None, description="UUID of the technician this customer prefers. Must belong to this business.")
-    service_area_id: Optional[StrictStr] = Field(default=None, description="UUID of the service area for this customer. Must belong to this business.")
-    status: Optional[StrictStr] = Field(default=None, description="Lifecycle status.")
-    tier: Optional[StrictStr] = Field(default=None, description="Loyalty tier.")
-    uid: Optional[Annotated[str, Field(strict=True, max_length=32)]] = Field(default=None, description="Your external reference for this customer. Optional; max 32 chars.")
-    __properties: ClassVar[List[str]] = ["address", "email", "full_name", "notes", "phone", "preferred_technician_id", "service_area_id", "status", "tier", "uid"]
+    address: Optional[CustomerAddressRequest] = Field(default=None, description="Postal address and coordinates. Omit the whole object to leave the stored address untouched; when present it REPLACES the address block.")
+    email: Optional[StrictStr] = Field(default=None, description="Email address. Omit to leave unchanged, \"\" to clear.")
+    full_name: Optional[Annotated[str, Field(strict=True, max_length=255)]] = Field(default=None, description="Customer's full name. Omit to leave unchanged; an empty or blank value is ignored (a customer cannot be left nameless). Max 255 chars.")
+    notes: Optional[Annotated[str, Field(strict=True, max_length=4000)]] = Field(default=None, description="Free-form internal notes about the customer. Omit to leave unchanged, \"\" to clear; max 4000 chars.")
+    phone: Optional[Annotated[str, Field(strict=True, max_length=20)]] = Field(default=None, description="Phone number in E.164 international format (`+16135550188`); a bare national number is rejected with PHONE_INVALID — see createCustomerReq.Phone. Omit to leave unchanged, \"\" to clear. 10–20 chars.")
+    preferred_technician_id: Optional[StrictStr] = Field(default=None, description="UUID of the technician this customer prefers. Omit to leave unchanged, \"\" to clear. Must belong to this business.")
+    service_area_id: Optional[StrictStr] = Field(default=None, description="UUID of the service area for this customer. Omit to leave unchanged, \"\" to clear. Must belong to this business.")
+    sms_opt_in: Optional[StrictBool] = Field(default=None, description="SMS consent, tri-state: omit/null = leave unchanged; true = grant (only when the customer explicitly consented — the original consent timestamp is preserved); false = revoke (opt-out, stops SMS immediately).")
+    status: Optional[StrictStr] = Field(default=None, description="Lifecycle status. Omit to leave unchanged; \"\" is ignored.")
+    tier: Optional[StrictStr] = Field(default=None, description="Loyalty tier. Omit to leave unchanged; \"\" is ignored (an enum has no empty member).")
+    uid: Optional[Annotated[str, Field(strict=True, max_length=32)]] = Field(default=None, description="Your external reference for this customer. Omit to leave unchanged, \"\" to clear. Max 32 chars.")
+    __properties: ClassVar[List[str]] = ["address", "email", "full_name", "notes", "phone", "preferred_technician_id", "service_area_id", "sms_opt_in", "status", "tier", "uid"]
 
     @field_validator('status')
     def status_validate_enum(cls, value):
@@ -121,6 +122,7 @@ class CustomerUpdateRequest(BaseModel):
             "phone": obj.get("phone"),
             "preferred_technician_id": obj.get("preferred_technician_id"),
             "service_area_id": obj.get("service_area_id"),
+            "sms_opt_in": obj.get("sms_opt_in"),
             "status": obj.get("status"),
             "tier": obj.get("tier"),
             "uid": obj.get("uid")

@@ -36,7 +36,7 @@ class TechnicianUpdateRequest(BaseModel):
     full_name: Annotated[str, Field(strict=True, max_length=255)] = Field(description="The person's full display name. Required; max 255 chars.")
     job_title: Optional[Annotated[str, Field(strict=True, max_length=255)]] = Field(default=None, description="Display title.")
     join_date: Optional[date] = Field(default=None, description="First working day (YYYY-MM-DD).")
-    phone: Optional[Annotated[str, Field(strict=True, max_length=50)]] = Field(default=None, description="At least one of phone/email is required.")
+    phone: Optional[Annotated[str, Field(strict=True, max_length=50)]] = Field(default=None, description="Phone number in E.164 international format (`+16135550188`); a bare national number is rejected with PHONE_INVALID — see AddTechnicianReq.Phone. At least one of phone/email is required — enforced in the usecase; see the note on AddTechnicianReq.Phone for why no binding rule may decide it.")
     start_location_lat: Optional[Union[Annotated[float, Field(le=90, strict=True, ge=-90)], Annotated[int, Field(le=90, strict=True, ge=-90)]]] = Field(default=None, description="Explicit day-start latitude in decimal degrees (-90..90); when set it wins over the address geocode.")
     start_location_long: Optional[Union[Annotated[float, Field(le=180, strict=True, ge=-180)], Annotated[int, Field(le=180, strict=True, ge=-180)]]] = Field(default=None, description="Explicit day-start longitude in decimal degrees (-180..180); when set it wins over the address geocode.")
     start_location_type: Optional[StrictStr] = Field(default=None, description="Day-start point: home or office; explicit coordinates win when set.")

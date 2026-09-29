@@ -19,8 +19,12 @@ from typing_extensions import Annotated
 from pydantic import Field, StrictInt, StrictStr
 from typing import Optional
 from typing_extensions import Annotated
+from crisphive.models.create_vehicle200_response import CreateVehicle200Response
 from crisphive.models.get_vehicle200_response import GetVehicle200Response
 from crisphive.models.list_vehicles200_response import ListVehicles200Response
+from crisphive.models.response_envelope import ResponseEnvelope
+from crisphive.models.vehicle_create_request import VehicleCreateRequest
+from crisphive.models.vehicle_update_request import VehicleUpdateRequest
 
 from crisphive.api_client import ApiClient, RequestSerialized
 from crisphive.api_response import ApiResponse
@@ -38,6 +42,583 @@ class VehicleApi:
         if api_client is None:
             api_client = ApiClient.get_default()
         self.api_client = api_client
+
+
+    @validate_call
+    def create_vehicle(
+        self,
+        vehicle_create_request: Annotated[VehicleCreateRequest, Field(description="Vehicle details")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> CreateVehicle200Response:
+        """Add a vehicle to the fleet
+
+        Registers a van, truck or car in the business's own fleet. Vehicles are what a confirmed job's crew travels in: at confirm, Crisphive auto-selects one vehicle for the whole crew from the lead technician's vehicles, then from unowned fleet vehicles, and blocks a vehicle already booked for an overlapping job.  `name` is the only required field, so a bulk fleet import needs nothing else; brand, model, year, plate_number, current_mileage and vehicle_type (van, truck or car) can be filled in later with updateVehicle. Names and plate numbers must be unique in the business (VEHICLE_DUPLICATE_NAME / VEHICLE_DUPLICATE_PLATE).  `owner_id` records who has CLAIMED the vehicle as their primary one. The owner must be a lead technician or a management role; a buddy- or float-tier profile is refused with VEHICLE_OWNER_TIER_NOT_ALLOWED, an unknown profile with VEHICLE_INVALID_OWNER. Deciding which vehicles a technician may USE is a separate relation: use replaceTechnicianVehicles for that, not this tool.  Send an Idempotency-Key header (the `idempotency_key` argument over MCP) so a retried call replays the original response instead of creating a duplicate vehicle.
+
+        :param vehicle_create_request: Vehicle details (required)
+        :type vehicle_create_request: VehicleCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_vehicle_serialize(
+            vehicle_create_request=vehicle_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateVehicle200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def create_vehicle_with_http_info(
+        self,
+        vehicle_create_request: Annotated[VehicleCreateRequest, Field(description="Vehicle details")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[CreateVehicle200Response]:
+        """Add a vehicle to the fleet
+
+        Registers a van, truck or car in the business's own fleet. Vehicles are what a confirmed job's crew travels in: at confirm, Crisphive auto-selects one vehicle for the whole crew from the lead technician's vehicles, then from unowned fleet vehicles, and blocks a vehicle already booked for an overlapping job.  `name` is the only required field, so a bulk fleet import needs nothing else; brand, model, year, plate_number, current_mileage and vehicle_type (van, truck or car) can be filled in later with updateVehicle. Names and plate numbers must be unique in the business (VEHICLE_DUPLICATE_NAME / VEHICLE_DUPLICATE_PLATE).  `owner_id` records who has CLAIMED the vehicle as their primary one. The owner must be a lead technician or a management role; a buddy- or float-tier profile is refused with VEHICLE_OWNER_TIER_NOT_ALLOWED, an unknown profile with VEHICLE_INVALID_OWNER. Deciding which vehicles a technician may USE is a separate relation: use replaceTechnicianVehicles for that, not this tool.  Send an Idempotency-Key header (the `idempotency_key` argument over MCP) so a retried call replays the original response instead of creating a duplicate vehicle.
+
+        :param vehicle_create_request: Vehicle details (required)
+        :type vehicle_create_request: VehicleCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_vehicle_serialize(
+            vehicle_create_request=vehicle_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateVehicle200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def create_vehicle_without_preload_content(
+        self,
+        vehicle_create_request: Annotated[VehicleCreateRequest, Field(description="Vehicle details")],
+        idempotency_key: Annotated[Optional[StrictStr], Field(description="Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Add a vehicle to the fleet
+
+        Registers a van, truck or car in the business's own fleet. Vehicles are what a confirmed job's crew travels in: at confirm, Crisphive auto-selects one vehicle for the whole crew from the lead technician's vehicles, then from unowned fleet vehicles, and blocks a vehicle already booked for an overlapping job.  `name` is the only required field, so a bulk fleet import needs nothing else; brand, model, year, plate_number, current_mileage and vehicle_type (van, truck or car) can be filled in later with updateVehicle. Names and plate numbers must be unique in the business (VEHICLE_DUPLICATE_NAME / VEHICLE_DUPLICATE_PLATE).  `owner_id` records who has CLAIMED the vehicle as their primary one. The owner must be a lead technician or a management role; a buddy- or float-tier profile is refused with VEHICLE_OWNER_TIER_NOT_ALLOWED, an unknown profile with VEHICLE_INVALID_OWNER. Deciding which vehicles a technician may USE is a separate relation: use replaceTechnicianVehicles for that, not this tool.  Send an Idempotency-Key header (the `idempotency_key` argument over MCP) so a retried call replays the original response instead of creating a duplicate vehicle.
+
+        :param vehicle_create_request: Vehicle details (required)
+        :type vehicle_create_request: VehicleCreateRequest
+        :param idempotency_key: Unique key making retries safe: a repeat send with the same key replays the original response (header Idempotent-Replayed: true) instead of re-running the operation. Reusing a key with a different body returns 422 IDEMPOTENCY_KEY_REUSE.
+        :type idempotency_key: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._create_vehicle_serialize(
+            vehicle_create_request=vehicle_create_request,
+            idempotency_key=idempotency_key,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "CreateVehicle200Response",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _create_vehicle_serialize(
+        self,
+        vehicle_create_request,
+        idempotency_key,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        # process the header parameters
+        if idempotency_key is not None:
+            _header_params['Idempotency-Key'] = idempotency_key
+        # process the form parameters
+        # process the body parameter
+        if vehicle_create_request is not None:
+            _body_params = vehicle_create_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/vehicles',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def delete_vehicle(
+        self,
+        id: Annotated[StrictStr, Field(description="Vehicle ID")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ResponseEnvelope:
+        """Retire a vehicle from the fleet
+
+        Soft-deletes the vehicle and, in the same transaction, removes it from every technician's vehicle list. It no longer appears in listVehicles or getVehicle and can no longer be auto-selected for a crew.  Jobs that referenced it keep the stored reference but no longer display an assigned vehicle, and upcoming jobs are NOT given a replacement automatically. Reach for this only when a vehicle leaves the fleet for good (sold, written off, off-lease). For a van that is merely in the workshop, set its `status` to maintenance with updateVehicle instead, so the record stays in the fleet and can be brought straight back.
+
+        :param id: Vehicle ID (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_vehicle_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def delete_vehicle_with_http_info(
+        self,
+        id: Annotated[StrictStr, Field(description="Vehicle ID")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[ResponseEnvelope]:
+        """Retire a vehicle from the fleet
+
+        Soft-deletes the vehicle and, in the same transaction, removes it from every technician's vehicle list. It no longer appears in listVehicles or getVehicle and can no longer be auto-selected for a crew.  Jobs that referenced it keep the stored reference but no longer display an assigned vehicle, and upcoming jobs are NOT given a replacement automatically. Reach for this only when a vehicle leaves the fleet for good (sold, written off, off-lease). For a van that is merely in the workshop, set its `status` to maintenance with updateVehicle instead, so the record stays in the fleet and can be brought straight back.
+
+        :param id: Vehicle ID (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_vehicle_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def delete_vehicle_without_preload_content(
+        self,
+        id: Annotated[StrictStr, Field(description="Vehicle ID")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Retire a vehicle from the fleet
+
+        Soft-deletes the vehicle and, in the same transaction, removes it from every technician's vehicle list. It no longer appears in listVehicles or getVehicle and can no longer be auto-selected for a crew.  Jobs that referenced it keep the stored reference but no longer display an assigned vehicle, and upcoming jobs are NOT given a replacement automatically. Reach for this only when a vehicle leaves the fleet for good (sold, written off, off-lease). For a van that is merely in the workshop, set its `status` to maintenance with updateVehicle instead, so the record stays in the fleet and can be brought straight back.
+
+        :param id: Vehicle ID (required)
+        :type id: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._delete_vehicle_serialize(
+            id=id,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _delete_vehicle_serialize(
+        self,
+        id,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if id is not None:
+            _path_params['id'] = id
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='DELETE',
+            resource_path='/vehicles/{id}',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
 
 
     @validate_call
@@ -96,6 +677,7 @@ class VehicleApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetVehicle200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -166,6 +748,7 @@ class VehicleApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetVehicle200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -236,6 +819,7 @@ class VehicleApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetVehicle200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -383,6 +967,7 @@ class VehicleApi:
             '200': "ListVehicles200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -469,6 +1054,7 @@ class VehicleApi:
             '200': "ListVehicles200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -555,6 +1141,7 @@ class VehicleApi:
             '200': "ListVehicles200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -635,6 +1222,313 @@ class VehicleApi:
         return self.api_client.param_serialize(
             method='GET',
             resource_path='/vehicles',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def update_vehicle(
+        self,
+        id: Annotated[StrictStr, Field(description="Vehicle ID")],
+        vehicle_update_request: Annotated[VehicleUpdateRequest, Field(description="Vehicle details")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ResponseEnvelope:
+        """Change a vehicle's details
+
+        Edits an existing fleet record in place; the vehicle id and the technicians who use it are untouched.  Partial update: omit a field to KEEP its current value, send \"\" to CLEAR an optional text field (brand, model, plate_number). Exceptions: `name` rejects \"\" because a vehicle must stay identifiable, and `vehicle_type` (van, truck, car) and `status` (inactive, idle, on_job, maintenance) must be valid enum values when present; an empty string there is a 400. `owner_id`: omit to keep the current owner, \"\" to unclaim, or a UUID to reassign; the new owner must be a lead or management profile (VEHICLE_OWNER_TIER_NOT_ALLOWED otherwise).  Use this for corrections and odometer updates, and set `status` to maintenance or inactive when a vehicle is temporarily out of service so it stays in the fleet. To change which technicians may use it, call replaceTechnicianVehicles; to take it out of the fleet for good, call deleteVehicle.
+
+        :param id: Vehicle ID (required)
+        :type id: str
+        :param vehicle_update_request: Vehicle details (required)
+        :type vehicle_update_request: VehicleUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_vehicle_serialize(
+            id=id,
+            vehicle_update_request=vehicle_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def update_vehicle_with_http_info(
+        self,
+        id: Annotated[StrictStr, Field(description="Vehicle ID")],
+        vehicle_update_request: Annotated[VehicleUpdateRequest, Field(description="Vehicle details")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[ResponseEnvelope]:
+        """Change a vehicle's details
+
+        Edits an existing fleet record in place; the vehicle id and the technicians who use it are untouched.  Partial update: omit a field to KEEP its current value, send \"\" to CLEAR an optional text field (brand, model, plate_number). Exceptions: `name` rejects \"\" because a vehicle must stay identifiable, and `vehicle_type` (van, truck, car) and `status` (inactive, idle, on_job, maintenance) must be valid enum values when present; an empty string there is a 400. `owner_id`: omit to keep the current owner, \"\" to unclaim, or a UUID to reassign; the new owner must be a lead or management profile (VEHICLE_OWNER_TIER_NOT_ALLOWED otherwise).  Use this for corrections and odometer updates, and set `status` to maintenance or inactive when a vehicle is temporarily out of service so it stays in the fleet. To change which technicians may use it, call replaceTechnicianVehicles; to take it out of the fleet for good, call deleteVehicle.
+
+        :param id: Vehicle ID (required)
+        :type id: str
+        :param vehicle_update_request: Vehicle details (required)
+        :type vehicle_update_request: VehicleUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_vehicle_serialize(
+            id=id,
+            vehicle_update_request=vehicle_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def update_vehicle_without_preload_content(
+        self,
+        id: Annotated[StrictStr, Field(description="Vehicle ID")],
+        vehicle_update_request: Annotated[VehicleUpdateRequest, Field(description="Vehicle details")],
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Change a vehicle's details
+
+        Edits an existing fleet record in place; the vehicle id and the technicians who use it are untouched.  Partial update: omit a field to KEEP its current value, send \"\" to CLEAR an optional text field (brand, model, plate_number). Exceptions: `name` rejects \"\" because a vehicle must stay identifiable, and `vehicle_type` (van, truck, car) and `status` (inactive, idle, on_job, maintenance) must be valid enum values when present; an empty string there is a 400. `owner_id`: omit to keep the current owner, \"\" to unclaim, or a UUID to reassign; the new owner must be a lead or management profile (VEHICLE_OWNER_TIER_NOT_ALLOWED otherwise).  Use this for corrections and odometer updates, and set `status` to maintenance or inactive when a vehicle is temporarily out of service so it stays in the fleet. To change which technicians may use it, call replaceTechnicianVehicles; to take it out of the fleet for good, call deleteVehicle.
+
+        :param id: Vehicle ID (required)
+        :type id: str
+        :param vehicle_update_request: Vehicle details (required)
+        :type vehicle_update_request: VehicleUpdateRequest
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._update_vehicle_serialize(
+            id=id,
+            vehicle_update_request=vehicle_update_request,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "ResponseEnvelope",
+            '400': "ResponseEnvelope",
+            '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
+            '404': "ResponseEnvelope",
+            '409': "ResponseEnvelope",
+            '429': "ResponseEnvelope",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _update_vehicle_serialize(
+        self,
+        id,
+        vehicle_update_request,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        if id is not None:
+            _path_params['id'] = id
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+        if vehicle_update_request is not None:
+            _body_params = vehicle_update_request
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'ApiKeyAuth'
+        ]
+
+        return self.api_client.param_serialize(
+            method='PUT',
+            resource_path='/vehicles/{id}',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,

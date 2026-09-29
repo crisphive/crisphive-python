@@ -69,7 +69,7 @@ class TechnicianApi:
     ) -> CreateTechnician200Response:
         """Add a technician
 
-        Creates a technician membership under the current business. If the phone/email matches an existing user, their account is linked. Otherwise a new user identity is created (no invite email — login is passwordless later). Either way the membership starts active. If the technician was previously removed (deactive) they are reactivated instead. Owner/Administrator groups cannot be assigned via API key, and not at all in sandbox mode.  Optional relations (all validated; any missing id → 404 TECHNICIAN_NOT_FOUND with `missing_ids`): `buddy_ids` sets this technician's buddy list (use when creating a lead); `lead_ids` adds this technician as a buddy of each named lead (use when creating a buddy — the buddy-side way to attach the same lead↔buddy relation); `service_area_ids` assigns the technician to those service areas.  `start_location_type=office` snapshots the business address + coordinates into the technician at create time; `address`, `start_location_lat`, `start_location_long` in the body are ignored. Requires the business to have coordinates set (else 400 BUSINESS_LOCATION_MISSING). `start_location_type=home` (or empty) uses the address + coordinates from the body.
+        Creates a technician membership under the current business. If the phone/email matches an existing user, their account is linked. Otherwise a new user identity is created. Either way the membership starts active. The new member is notified (live mode only, best-effort): an email when `email` is supplied, an SMS when `phone` is supplied, both when both — informational only, no activation step (login stays passwordless: magic link / OTP). Re-adding someone: if the person is currently SUSPENDED on this business (a dashboard action — not reachable via this API), the create REACTIVATES that existing membership (same technician id, their existing group; also notified). A technician REMOVED with deleteTechnician is a closed membership: re-adding the same email/phone links the SAME underlying person (no duplicate identity) but creates a FRESH membership with a NEW id — history stays under the old one. Owner/Administrator groups cannot be assigned via API key, and not at all in sandbox mode.  Optional relations (all validated; any missing id → 404 TECHNICIAN_NOT_FOUND with `missing_ids`): `buddy_ids` sets this technician's buddy list (use when creating a lead); `lead_ids` adds this technician as a buddy of each named lead (use when creating a buddy — the buddy-side way to attach the same lead↔buddy relation); `service_area_ids` assigns the technician to those service areas.  `start_location_type=office` snapshots the business address + coordinates into the technician at create time; `address`, `start_location_lat`, `start_location_long` in the body are ignored. Requires the business to have coordinates set (else 400 BUSINESS_LOCATION_MISSING). `start_location_type=home` (or empty) uses the address + coordinates from the body.
 
         :param technician_create_request: Technician details (required)
         :type technician_create_request: TechnicianCreateRequest
@@ -146,7 +146,7 @@ class TechnicianApi:
     ) -> ApiResponse[CreateTechnician200Response]:
         """Add a technician
 
-        Creates a technician membership under the current business. If the phone/email matches an existing user, their account is linked. Otherwise a new user identity is created (no invite email — login is passwordless later). Either way the membership starts active. If the technician was previously removed (deactive) they are reactivated instead. Owner/Administrator groups cannot be assigned via API key, and not at all in sandbox mode.  Optional relations (all validated; any missing id → 404 TECHNICIAN_NOT_FOUND with `missing_ids`): `buddy_ids` sets this technician's buddy list (use when creating a lead); `lead_ids` adds this technician as a buddy of each named lead (use when creating a buddy — the buddy-side way to attach the same lead↔buddy relation); `service_area_ids` assigns the technician to those service areas.  `start_location_type=office` snapshots the business address + coordinates into the technician at create time; `address`, `start_location_lat`, `start_location_long` in the body are ignored. Requires the business to have coordinates set (else 400 BUSINESS_LOCATION_MISSING). `start_location_type=home` (or empty) uses the address + coordinates from the body.
+        Creates a technician membership under the current business. If the phone/email matches an existing user, their account is linked. Otherwise a new user identity is created. Either way the membership starts active. The new member is notified (live mode only, best-effort): an email when `email` is supplied, an SMS when `phone` is supplied, both when both — informational only, no activation step (login stays passwordless: magic link / OTP). Re-adding someone: if the person is currently SUSPENDED on this business (a dashboard action — not reachable via this API), the create REACTIVATES that existing membership (same technician id, their existing group; also notified). A technician REMOVED with deleteTechnician is a closed membership: re-adding the same email/phone links the SAME underlying person (no duplicate identity) but creates a FRESH membership with a NEW id — history stays under the old one. Owner/Administrator groups cannot be assigned via API key, and not at all in sandbox mode.  Optional relations (all validated; any missing id → 404 TECHNICIAN_NOT_FOUND with `missing_ids`): `buddy_ids` sets this technician's buddy list (use when creating a lead); `lead_ids` adds this technician as a buddy of each named lead (use when creating a buddy — the buddy-side way to attach the same lead↔buddy relation); `service_area_ids` assigns the technician to those service areas.  `start_location_type=office` snapshots the business address + coordinates into the technician at create time; `address`, `start_location_lat`, `start_location_long` in the body are ignored. Requires the business to have coordinates set (else 400 BUSINESS_LOCATION_MISSING). `start_location_type=home` (or empty) uses the address + coordinates from the body.
 
         :param technician_create_request: Technician details (required)
         :type technician_create_request: TechnicianCreateRequest
@@ -223,7 +223,7 @@ class TechnicianApi:
     ) -> RESTResponseType:
         """Add a technician
 
-        Creates a technician membership under the current business. If the phone/email matches an existing user, their account is linked. Otherwise a new user identity is created (no invite email — login is passwordless later). Either way the membership starts active. If the technician was previously removed (deactive) they are reactivated instead. Owner/Administrator groups cannot be assigned via API key, and not at all in sandbox mode.  Optional relations (all validated; any missing id → 404 TECHNICIAN_NOT_FOUND with `missing_ids`): `buddy_ids` sets this technician's buddy list (use when creating a lead); `lead_ids` adds this technician as a buddy of each named lead (use when creating a buddy — the buddy-side way to attach the same lead↔buddy relation); `service_area_ids` assigns the technician to those service areas.  `start_location_type=office` snapshots the business address + coordinates into the technician at create time; `address`, `start_location_lat`, `start_location_long` in the body are ignored. Requires the business to have coordinates set (else 400 BUSINESS_LOCATION_MISSING). `start_location_type=home` (or empty) uses the address + coordinates from the body.
+        Creates a technician membership under the current business. If the phone/email matches an existing user, their account is linked. Otherwise a new user identity is created. Either way the membership starts active. The new member is notified (live mode only, best-effort): an email when `email` is supplied, an SMS when `phone` is supplied, both when both — informational only, no activation step (login stays passwordless: magic link / OTP). Re-adding someone: if the person is currently SUSPENDED on this business (a dashboard action — not reachable via this API), the create REACTIVATES that existing membership (same technician id, their existing group; also notified). A technician REMOVED with deleteTechnician is a closed membership: re-adding the same email/phone links the SAME underlying person (no duplicate identity) but creates a FRESH membership with a NEW id — history stays under the old one. Owner/Administrator groups cannot be assigned via API key, and not at all in sandbox mode.  Optional relations (all validated; any missing id → 404 TECHNICIAN_NOT_FOUND with `missing_ids`): `buddy_ids` sets this technician's buddy list (use when creating a lead); `lead_ids` adds this technician as a buddy of each named lead (use when creating a buddy — the buddy-side way to attach the same lead↔buddy relation); `service_area_ids` assigns the technician to those service areas.  `start_location_type=office` snapshots the business address + coordinates into the technician at create time; `address`, `start_location_lat`, `start_location_long` in the body are ignored. Requires the business to have coordinates set (else 400 BUSINESS_LOCATION_MISSING). `start_location_type=home` (or empty) uses the address + coordinates from the body.
 
         :param technician_create_request: Technician details (required)
         :type technician_create_request: TechnicianCreateRequest
@@ -373,9 +373,9 @@ class TechnicianApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> ResponseEnvelope:
-        """Remove a technician
+        """Remove a technician from the business
 
-        Soft-removes a technician from the business by setting status to deactive
+        Closes the technician's membership: the profile is set to deactive and soft-deleted, and their access to this business ends on their next request. In the same operation they are removed from every other technician's buddy list, vehicles they own are released, and any personal-calendar connection they made for this business is revoked. Fires the technician.deleted webhook. Their underlying user identity is untouched, and so are memberships at other businesses.  Removal does NOT move their work: jobs still assigned to them keep the assignment and must be re-staffed. Do that BEFORE removing: use listCrewCandidates on each upcoming job, or re-plan the whole day with previewAbsenceResolve / commitAbsenceResolve (which needs a time-off record covering those days; create one with createTechnicianTimeOff).  This is a closed membership, not a pause. Re-adding the same email or phone later with createTechnician links the SAME person but opens a FRESH membership with a NEW technician id and none of the old buddy, vehicle or area links. If you expect the person back, suspend them from the dashboard instead; a suspended member is reactivated in place by createTechnician, keeping their id and group.  The last active Owner cannot be removed (TECHNICIAN_LAST_OWNER). API keys the person created are NOT revoked (an HR action must not take an integration down); if any are still active, the business Owners and Administrators are emailed a list of them.
 
         :param id: Technician ID (required)
         :type id: str
@@ -412,6 +412,7 @@ class TechnicianApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -444,9 +445,9 @@ class TechnicianApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> ApiResponse[ResponseEnvelope]:
-        """Remove a technician
+        """Remove a technician from the business
 
-        Soft-removes a technician from the business by setting status to deactive
+        Closes the technician's membership: the profile is set to deactive and soft-deleted, and their access to this business ends on their next request. In the same operation they are removed from every other technician's buddy list, vehicles they own are released, and any personal-calendar connection they made for this business is revoked. Fires the technician.deleted webhook. Their underlying user identity is untouched, and so are memberships at other businesses.  Removal does NOT move their work: jobs still assigned to them keep the assignment and must be re-staffed. Do that BEFORE removing: use listCrewCandidates on each upcoming job, or re-plan the whole day with previewAbsenceResolve / commitAbsenceResolve (which needs a time-off record covering those days; create one with createTechnicianTimeOff).  This is a closed membership, not a pause. Re-adding the same email or phone later with createTechnician links the SAME person but opens a FRESH membership with a NEW technician id and none of the old buddy, vehicle or area links. If you expect the person back, suspend them from the dashboard instead; a suspended member is reactivated in place by createTechnician, keeping their id and group.  The last active Owner cannot be removed (TECHNICIAN_LAST_OWNER). API keys the person created are NOT revoked (an HR action must not take an integration down); if any are still active, the business Owners and Administrators are emailed a list of them.
 
         :param id: Technician ID (required)
         :type id: str
@@ -483,6 +484,7 @@ class TechnicianApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -515,9 +517,9 @@ class TechnicianApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> RESTResponseType:
-        """Remove a technician
+        """Remove a technician from the business
 
-        Soft-removes a technician from the business by setting status to deactive
+        Closes the technician's membership: the profile is set to deactive and soft-deleted, and their access to this business ends on their next request. In the same operation they are removed from every other technician's buddy list, vehicles they own are released, and any personal-calendar connection they made for this business is revoked. Fires the technician.deleted webhook. Their underlying user identity is untouched, and so are memberships at other businesses.  Removal does NOT move their work: jobs still assigned to them keep the assignment and must be re-staffed. Do that BEFORE removing: use listCrewCandidates on each upcoming job, or re-plan the whole day with previewAbsenceResolve / commitAbsenceResolve (which needs a time-off record covering those days; create one with createTechnicianTimeOff).  This is a closed membership, not a pause. Re-adding the same email or phone later with createTechnician links the SAME person but opens a FRESH membership with a NEW technician id and none of the old buddy, vehicle or area links. If you expect the person back, suspend them from the dashboard instead; a suspended member is reactivated in place by createTechnician, keeping their id and group.  The last active Owner cannot be removed (TECHNICIAN_LAST_OWNER). API keys the person created are NOT revoked (an HR action must not take an integration down); if any are still active, the business Owners and Administrators are emailed a list of them.
 
         :param id: Technician ID (required)
         :type id: str
@@ -554,6 +556,7 @@ class TechnicianApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '409': "ResponseEnvelope",
             '429': "ResponseEnvelope",
@@ -685,6 +688,7 @@ class TechnicianApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetTechnician200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -755,6 +759,7 @@ class TechnicianApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetTechnician200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -825,6 +830,7 @@ class TechnicianApi:
         _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetTechnician200Response",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -980,6 +986,7 @@ class TechnicianApi:
             '200': "ListTechnicians200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -1074,6 +1081,7 @@ class TechnicianApi:
             '200': "ListTechnicians200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -1168,6 +1176,7 @@ class TechnicianApi:
             '200': "ListTechnicians200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
         response_data = self.api_client.call_api(
@@ -1334,6 +1343,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1409,6 +1419,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1484,6 +1495,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1635,6 +1647,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1710,6 +1723,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1785,6 +1799,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -1936,6 +1951,7 @@ class TechnicianApi:
             '200': "ReplaceTechnicianServiceAreas200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -2011,6 +2027,7 @@ class TechnicianApi:
             '200': "ReplaceTechnicianServiceAreas200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -2086,6 +2103,7 @@ class TechnicianApi:
             '200': "ReplaceTechnicianServiceAreas200Response",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -2237,6 +2255,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -2312,6 +2331,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }
@@ -2387,6 +2407,7 @@ class TechnicianApi:
             '200': "ResponseEnvelope",
             '400': "ResponseEnvelope",
             '401': "ResponseEnvelope",
+            '403': "ResponseEnvelope",
             '404': "ResponseEnvelope",
             '429': "ResponseEnvelope",
         }

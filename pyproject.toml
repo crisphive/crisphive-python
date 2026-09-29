@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "crisphive"
-version = "0.2.0"
+version = "0.3.0"
 description = "Official Python SDK for the Crisphive API."
 authors = ["Crisphive <developer@crisphive.com>"]
 license = "MIT"

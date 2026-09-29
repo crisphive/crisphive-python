@@ -18,7 +18,7 @@ import re  # noqa: F401
 import json
 
 from datetime import date
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing_extensions import Annotated
 from crisphive.models.technician_address_input import TechnicianAddressInput
@@ -38,12 +38,13 @@ class TechnicianCreateRequest(BaseModel):
     job_title: Optional[Annotated[str, Field(strict=True, max_length=255)]] = Field(default=None, description="Display title (e.g. \"Senior HVAC Technician\").")
     join_date: Optional[date] = Field(default=None, description="First working day (YYYY-MM-DD).")
     lead_ids: Optional[Annotated[List[StrictStr], Field(max_length=50)]] = Field(default=None, description="Leads this technician is a buddy of (set when creating a buddy; the technician is appended to each lead's buddy list). Optional; max 50 technician ids.")
-    phone: Optional[Annotated[str, Field(strict=True, max_length=50)]] = Field(default=None, description="At least one of phone/email is required (identity resolution key).")
+    notify: Optional[StrictBool] = Field(default=None, description="Whether to send the new member the \"you have been added to {business}\" message (email when an email was supplied, SMS when a phone was, both when both). Omitted or true sends it; false stays silent. Set false for bulk imports so seeding a roster does not text everybody at once.")
+    phone: Optional[Annotated[str, Field(strict=True, max_length=50)]] = Field(default=None, description="Phone number in E.164 international format: a leading `+` and the country code, e.g. `+16135550188`. A bare national number (`6135550188`) is REJECTED with PHONE_INVALID — there is no default region to guess the country from. At least one of phone/email is required (identity resolution key).")
     service_area_ids: Optional[Annotated[List[StrictStr], Field(max_length=50)]] = Field(default=None, description="Service areas to assign the technician to. Optional; max 50. Discover via GET /service-areas.")
     start_location_lat: Optional[Union[Annotated[float, Field(le=90, strict=True, ge=-90)], Annotated[int, Field(le=90, strict=True, ge=-90)]]] = Field(default=None, description="Explicit day-start latitude in decimal degrees (-90..90); when set it wins over the address geocode.")
     start_location_long: Optional[Union[Annotated[float, Field(le=180, strict=True, ge=-180)], Annotated[int, Field(le=180, strict=True, ge=-180)]]] = Field(default=None, description="Explicit day-start longitude in decimal degrees (-180..180); when set it wins over the address geocode.")
     start_location_type: Optional[StrictStr] = Field(default=None, description="Where the technician starts their day: home (their address) or office (the business location). Drives the engine's travel estimates.")
-    __properties: ClassVar[List[str]] = ["address", "assignment_tier", "buddy_ids", "business_group_id", "email", "full_name", "job_title", "join_date", "lead_ids", "phone", "service_area_ids", "start_location_lat", "start_location_long", "start_location_type"]
+    __properties: ClassVar[List[str]] = ["address", "assignment_tier", "buddy_ids", "business_group_id", "email", "full_name", "job_title", "join_date", "lead_ids", "notify", "phone", "service_area_ids", "start_location_lat", "start_location_long", "start_location_type"]
 
     @field_validator('assignment_tier')
     def assignment_tier_validate_enum(cls, value):
@@ -128,6 +129,7 @@ class TechnicianCreateRequest(BaseModel):
             "job_title": obj.get("job_title"),
             "join_date": obj.get("join_date"),
             "lead_ids": obj.get("lead_ids"),
+            "notify": obj.get("notify"),
             "phone": obj.get("phone"),
             "service_area_ids": obj.get("service_area_ids"),
             "start_location_lat": obj.get("start_location_lat"),

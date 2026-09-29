@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt
 from typing import Any, ClassVar, Dict, List, Optional
 from typing_extensions import Annotated
 from crisphive.models.job_request_crew_member_input import JobRequestCrewMemberInput
@@ -30,10 +30,11 @@ class JobRequestQuoteRequest(BaseModel):
     """ # noqa: E501
     crew: Optional[Annotated[List[JobRequestCrewMemberInput], Field(max_length=20)]] = Field(default=None, description="Crew — multi-person plan (tech lead + buddies). Omit / empty = single person (lead 100%). When present must have exactly one is_lead and wrench_percent summing to 100. See MULTIPERSON_CREW_DESIGN.md.")
     demobilization_minutes: Optional[Annotated[int, Field(strict=True, ge=0)]] = Field(default=None, description="Demobilization (teardown) minutes added after the work. Optional, min 0.")
-    job_duration_minutes: Annotated[int, Field(strict=True, ge=1)] = Field(description="Hands-on work duration in minutes (man-minutes for a crew job). Required, min 1.")
+    force: Optional[StrictBool] = Field(default=None, description="Schedule the job even when no technician can take it in ANY window the customer asked for (outside working hours, outside every service area, nobody free). Without it that case answers 409 JOB_REQUEST_QUOTE_NOT_SCHEDULABLE with the reason, so the coordinator can agree a different time with the customer first. Send true only after that conversation; the override is recorded in the activity feed.")
+    job_duration_minutes: Optional[Annotated[int, Field(strict=True, ge=1)]] = Field(default=None, description="Hands-on work duration in minutes (man-minutes for a crew job), min 1. On POST /quote it may be OMITTED when the job's job type carries a default_duration_minutes: the quote then uses the type's default duration and its default buffers (a buffer you send still wins). No duration and no default answers 400 JOB_REQUEST_QUOTE_INVALID. PATCH /quote always requires it.")
     mobilization_minutes: Optional[Annotated[int, Field(strict=True, ge=0)]] = Field(default=None, description="Mobilization (setup/travel-prep) minutes added before the work. Optional, min 0.")
     status_version: Optional[StrictInt] = Field(default=None, description="Optimistic-lock fence: the status_version from your last read. Omitted/0 = fence on the row's current version (no race protection).")
-    __properties: ClassVar[List[str]] = ["crew", "demobilization_minutes", "job_duration_minutes", "mobilization_minutes", "status_version"]
+    __properties: ClassVar[List[str]] = ["crew", "demobilization_minutes", "force", "job_duration_minutes", "mobilization_minutes", "status_version"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -95,6 +96,7 @@ class JobRequestQuoteRequest(BaseModel):
         _obj = cls.model_validate({
             "crew": [JobRequestCrewMemberInput.from_dict(_item) for _item in obj["crew"]] if obj.get("crew") is not None else None,
             "demobilization_minutes": obj.get("demobilization_minutes"),
+            "force": obj.get("force"),
             "job_duration_minutes": obj.get("job_duration_minutes"),
             "mobilization_minutes": obj.get("mobilization_minutes"),
             "status_version": obj.get("status_version")

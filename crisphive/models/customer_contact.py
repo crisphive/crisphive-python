@@ -17,11 +17,12 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from crisphive.models.customer_address import CustomerAddress
-from crisphive.models.service_area import ServiceArea
-from crisphive.models.technician import Technician
+from crisphive.models.customer_service_area_ref import CustomerServiceAreaRef
+from crisphive.models.customer_technician_ref import CustomerTechnicianRef
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -32,9 +33,11 @@ class CustomerContact(BaseModel):
     address: Optional[CustomerAddress] = Field(default=None, description="Postal address and coordinates.")
     email: Optional[StrictStr] = Field(default=None, description="Email address.")
     phone: Optional[StrictStr] = Field(default=None, description="Phone number in the form it was supplied.")
-    preferred_technician: Optional[Technician] = Field(default=None, description="The technician this customer prefers, if one is set; otherwise null.")
-    service_area: Optional[ServiceArea] = Field(default=None, description="The service area this customer falls in, if resolved; otherwise null.")
-    __properties: ClassVar[List[str]] = ["address", "email", "phone", "preferred_technician", "service_area"]
+    preferred_technician: Optional[CustomerTechnicianRef] = Field(default=None, description="The technician this customer prefers, if one is set; otherwise null.")
+    service_area: Optional[CustomerServiceAreaRef] = Field(default=None, description="The service area this customer falls in, if resolved; otherwise null.")
+    sms_opt_in: Optional[StrictBool] = Field(default=None, description="True when the customer has explicitly consented to receive SMS. SMS notifications to this customer are suppressed while false.")
+    sms_opt_in_at: Optional[datetime] = Field(default=None, description="When SMS consent was granted (RFC3339); null when sms_opt_in is false.")
+    __properties: ClassVar[List[str]] = ["address", "email", "phone", "preferred_technician", "service_area", "sms_opt_in", "sms_opt_in_at"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -99,8 +102,10 @@ class CustomerContact(BaseModel):
             "address": CustomerAddress.from_dict(obj["address"]) if obj.get("address") is not None else None,
             "email": obj.get("email"),
             "phone": obj.get("phone"),
-            "preferred_technician": Technician.from_dict(obj["preferred_technician"]) if obj.get("preferred_technician") is not None else None,
-            "service_area": ServiceArea.from_dict(obj["service_area"]) if obj.get("service_area") is not None else None
+            "preferred_technician": CustomerTechnicianRef.from_dict(obj["preferred_technician"]) if obj.get("preferred_technician") is not None else None,
+            "service_area": CustomerServiceAreaRef.from_dict(obj["service_area"]) if obj.get("service_area") is not None else None,
+            "sms_opt_in": obj.get("sms_opt_in"),
+            "sms_opt_in_at": obj.get("sms_opt_in_at")
         })
         return _obj
 

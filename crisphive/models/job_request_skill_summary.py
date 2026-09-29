@@ -30,7 +30,7 @@ class JobRequestSkillSummary(BaseModel):
     category_name: Optional[StrictStr] = Field(default=None, description="Category display name.")
     id: Optional[StrictStr] = Field(default=None, description="Skill UUID.")
     is_active: Optional[StrictBool] = Field(default=None, description="Whether the skill is currently active.")
-    name: Optional[StrictStr] = Field(default=None, description="Skill display name (resolved to the request locale).")
+    name: Optional[StrictStr] = Field(default=None, description="Skill display name (canonical; skill names carry no locale translations, so this is NOT resolved to the request locale).")
     __properties: ClassVar[List[str]] = ["category_id", "category_name", "id", "is_active", "name"]
 
     model_config = ConfigDict(

@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from typing_extensions import Annotated
 from typing import Optional, Set
@@ -27,13 +27,14 @@ class JobRequestMoveCommitReq(BaseModel):
     """
     JobRequestMoveCommitReq
     """ # noqa: E501
+    after_hours_override: Optional[StrictBool] = Field(default=None, description="AfterHoursOverride — drop the non-working-day rejection for a P0 whose technician the coordinator has already phoned. P0 only (JOB_REQUEST_AFTER_HOURS_REQUIRES_P0 otherwise), and the preview then carries an AFTER_HOURS warning. Commit must repeat what the preview was run with.")
     expected_member_ids: Optional[List[StrictStr]] = Field(default=None, description="ExpectedMemberIDs — crew moves only: the FULL member set the preview staffed (echo data.members[].technician_id). If the commit's re-plan would staff a DIFFERENT set (a previewed replacement got booked in the meantime), the commit is rejected with SCHEDULE_MOVE_PLAN_DRIFTED — crew swaps are never approved unseen. Omit to opt out.")
     expected_move_ids: Optional[List[StrictStr]] = Field(default=None, description="ExpectedMoveIDs — the displaced job IDs the preview returned (echo data.days[].moves[].job_id). Optional but RECOMMENDED: if the schedule changed so the commit would push a different set (e.g. a job booked onto the target tech since the preview), the commit is rejected with SCHEDULE_MOVE_PLAN_DRIFTED instead of silently pushing an unseen job.")
     expected_version: Optional[Annotated[int, Field(strict=True, ge=0)]] = Field(default=None, description="ExpectedVersion — the moved job's status_version from the preview (0 = fence on the fresh plan-read value; negatives rejected).")
     mode: StrictStr = Field(description="Cascade mode: overtime | next_day (must match the preview).")
     start_at: StrictStr = Field(description="New start — business-local naive datetime, no offset. Must match the preview and be in the future.")
     technician_id: StrictStr = Field(description="Target technician (must match the preview).")
-    __properties: ClassVar[List[str]] = ["expected_member_ids", "expected_move_ids", "expected_version", "mode", "start_at", "technician_id"]
+    __properties: ClassVar[List[str]] = ["after_hours_override", "expected_member_ids", "expected_move_ids", "expected_version", "mode", "start_at", "technician_id"]
 
     @field_validator('mode')
     def mode_validate_enum(cls, value):
@@ -93,6 +94,7 @@ class JobRequestMoveCommitReq(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "after_hours_override": obj.get("after_hours_override"),
             "expected_member_ids": obj.get("expected_member_ids"),
             "expected_move_ids": obj.get("expected_move_ids"),
             "expected_version": obj.get("expected_version"),

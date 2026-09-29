@@ -29,7 +29,7 @@ class JobRequestActionSummary(BaseModel):
     actor: Optional[StrictStr] = Field(default=None, description="Role expected to fire this action.")
     capabilities: Optional[List[StrictStr]] = Field(default=None, description="Capability slugs declared on the action (e.g. client_location). Omitted when none.")
     key: Optional[StrictStr] = Field(default=None, description="Action key (e.g. quote, confirm_booking, complete, or a custom DYNAMIC action).")
-    label: Optional[StrictStr] = Field(default=None, description="Action label, resolved to the request locale.")
+    label: Optional[StrictStr] = Field(default=None, description="Action label as authored on the workflow (canonical; NOT resolved to the request locale).")
     __properties: ClassVar[List[str]] = ["actor", "capabilities", "key", "label"]
 
     @field_validator('actor')

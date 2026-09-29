@@ -19,6 +19,7 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional, Union
+from crisphive.models.job_request_move_warning import JobRequestMoveWarning
 from crisphive.models.job_request_reschedule_day import JobRequestRescheduleDay
 from typing import Optional, Set
 from typing_extensions import Self
@@ -36,7 +37,8 @@ class JobRequestEmergencyCandidate(BaseModel):
     total_moves: Optional[StrictInt] = Field(default=None, description="How many jobs choosing this tech would push (0 = free slot).")
     total_score: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Smart-assign engine ranking score (higher = better fit).")
     travel_minutes: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="ETA estimate in minutes from the tech's start location to the site — static origin (no live GPS), rank hint not a promise.")
-    __properties: ClassVar[List[str]] = ["booked_minutes", "days", "distance_km", "full_name", "matched_skills", "technician_id", "total_moves", "total_score", "travel_minutes"]
+    warnings: Optional[List[JobRequestMoveWarning]] = Field(default=None, description="Per-technician warnings, e.g. TIME_OFF_OVERLAP when this technician is on approved leave at the requested time (only reachable with after_hours_override, which stops leave from rejecting).")
+    __properties: ClassVar[List[str]] = ["booked_minutes", "days", "distance_km", "full_name", "matched_skills", "technician_id", "total_moves", "total_score", "travel_minutes", "warnings"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -84,6 +86,13 @@ class JobRequestEmergencyCandidate(BaseModel):
                 if _item_days:
                     _items.append(_item_days.to_dict())
             _dict['days'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in warnings (list)
+        _items = []
+        if self.warnings:
+            for _item_warnings in self.warnings:
+                if _item_warnings:
+                    _items.append(_item_warnings.to_dict())
+            _dict['warnings'] = _items
         return _dict
 
     @classmethod
@@ -104,7 +113,8 @@ class JobRequestEmergencyCandidate(BaseModel):
             "technician_id": obj.get("technician_id"),
             "total_moves": obj.get("total_moves"),
             "total_score": obj.get("total_score"),
-            "travel_minutes": obj.get("travel_minutes")
+            "travel_minutes": obj.get("travel_minutes"),
+            "warnings": [JobRequestMoveWarning.from_dict(_item) for _item in obj["warnings"]] if obj.get("warnings") is not None else None
         })
         return _obj
 

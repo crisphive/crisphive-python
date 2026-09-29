@@ -17,7 +17,8 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -26,12 +27,13 @@ class JobRequestEmergencyPreviewRequest(BaseModel):
     """
     JobRequestEmergencyPreviewRequest
     """ # noqa: E501
+    after_hours_override: Optional[StrictBool] = Field(default=None, description="Place this P0 outside working hours / approved time-off — you have phoned the technician and they agreed. Drops the non-working-day rejection; the response then carries an AFTER_HOURS warning. Double-booking, service area, required skills and the lead-tier rule still reject.")
     displacement_mode: Optional[StrictStr] = Field(default=None, description="Fate of displaced jobs: reschedule (default — pushed to later windows) or reassign (handed to another feasible technician at their ORIGINAL time; no-capacity jobs fall back to reschedule).")
     emergency_job_id: StrictStr = Field(description="ID of the P0 job to insert.")
     mode: StrictStr = Field(description="Cascade mode: overtime = displaced jobs stay same-day (tech works late); next_day = overflow rolls to the next working day.")
-    start_at: StrictStr = Field(description="Desired start — business-local naive datetime, no offset. Must be in the future.")
+    start_at: datetime = Field(description="Desired start — business-local wall clock. Seconds may be omitted and a space may replace the T; an offset is accepted only when it agrees with the business timezone (a disagreeing one is refused with JOB_REQUEST_INVALID_INPUT rather than guessed). Must be in the future.")
     technician_id: StrictStr = Field(description="Target technician (must belong to the business).")
-    __properties: ClassVar[List[str]] = ["displacement_mode", "emergency_job_id", "mode", "start_at", "technician_id"]
+    __properties: ClassVar[List[str]] = ["after_hours_override", "displacement_mode", "emergency_job_id", "mode", "start_at", "technician_id"]
 
     @field_validator('displacement_mode')
     def displacement_mode_validate_enum(cls, value):
@@ -101,6 +103,7 @@ class JobRequestEmergencyPreviewRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "after_hours_override": obj.get("after_hours_override"),
             "displacement_mode": obj.get("displacement_mode"),
             "emergency_job_id": obj.get("emergency_job_id"),
             "mode": obj.get("mode"),

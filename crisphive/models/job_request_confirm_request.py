@@ -17,7 +17,8 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -26,11 +27,12 @@ class JobRequestConfirmRequest(BaseModel):
     """
     JobRequestConfirmRequest
     """ # noqa: E501
+    after_hours_override: Optional[StrictBool] = Field(default=None, description="AfterHoursOverride (BUSINESS confirm only): schedule this P0 outside the technician's working hours or approved time-off — you have phoned them and they agreed. Requires priority p0, a single-person job, and technician_id. Double-booking, service area, required skills and the lead-tier rule still reject. Deliberately NOT a binding-tag rule: gin evaluates tags before the handler, which would make the three AFTER_HOURS codes unreachable.")
     arrival_window_minutes: Optional[StrictInt] = Field(default=None, description="ArrivalWindowMinutes = width (phút) của arrival-window ô khách bấm ở slot-picker (chính là time_slot_step_minutes, mặc định 30). Persist để post-confirm detail render lại đúng window. Optional; bounds ([5, 240], khớp slot-picker step) validate ở usecase — single authority, một error code (JOB_REQUEST_INVALID_INPUT).")
-    scheduled_at: Optional[StrictStr] = Field(default=None, description="Chosen start time — business-local naive datetime, no offset (the business_time.datetime value from the time-segments picker). The server converts to UTC using the job's business timezone.")
+    scheduled_at: Optional[datetime] = Field(default=None, description="Chosen start time — business-local wall clock (the business_time.datetime value from the time-segments picker), converted to UTC against the job's business timezone. Seconds may be omitted and a space may replace the T. An offset is accepted only when it agrees with the business timezone; a disagreeing one is refused with JOB_REQUEST_INVALID_INPUT naming what it means locally.")
     status_version: Optional[StrictInt] = Field(default=None, description="Optimistic-lock fence: the status_version from your last read. Omitted/0 = fence on the row's current version (no race protection).")
     technician_id: Optional[StrictStr] = Field(default=None, description="TechnicianID (BUSINESS confirm only — ignored on the customer surface): force-assign the job to this technician instead of the ranked auto-pick. Ranking is bypassed; feasibility (hours/time-off/geo/skills), the TierLead rule and the double-booking guard still apply — an infeasible forced tech rejects the confirm (P0 gets the displacement hint).")
-    __properties: ClassVar[List[str]] = ["arrival_window_minutes", "scheduled_at", "status_version", "technician_id"]
+    __properties: ClassVar[List[str]] = ["after_hours_override", "arrival_window_minutes", "scheduled_at", "status_version", "technician_id"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -83,6 +85,7 @@ class JobRequestConfirmRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "after_hours_override": obj.get("after_hours_override"),
             "arrival_window_minutes": obj.get("arrival_window_minutes"),
             "scheduled_at": obj.get("scheduled_at"),
             "status_version": obj.get("status_version"),
