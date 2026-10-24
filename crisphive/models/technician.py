@@ -36,6 +36,9 @@ class Technician(BaseModel):
     buddy_ids: Optional[List[StrictStr]] = Field(default=None, description="UUIDs of this technician's buddies (the techs they prefer to work alongside).")
     business_group_id: Optional[StrictStr] = Field(default=None, description="UUID of the permission group (role) this technician is assigned to.")
     business_id: Optional[StrictStr] = Field(default=None, description="UUID of the business this technician belongs to.")
+    calendar_nudge_due_at: Optional[datetime] = Field(default=None, description="Precomputed deadline for the single calendar-connect nudge -- CalendarRequestedAt plus the sweep's three-day window -- so the dashboard never has to add three days and guess (the `is_fallback` / `token_stale` convention: the server computes the table state). Omitted, never null, whenever nothing is due: never requested, or already nudged.")
+    calendar_nudged_at: Optional[datetime] = Field(default=None, description="Set (RFC3339) once the one-time unanswered-request reminder has been sent (calendarsync.nudge_sweep); omitted otherwise -- either because the technician answered, or because the three-day window has not elapsed yet. The sweep never nudges twice.")
+    calendar_requested_at: Optional[datetime] = Field(default=None, description="Set (RFC3339) when the business asked this technician to connect a personal calendar (calendarsync's invite flow, CALENDAR_SYNC_DESIGN.md §5); omitted if never asked. This is the ONLY surface that reports it for a technician who has not yet connected -- calendarsync's own connections list has no row for them at all.")
     created_at: Optional[datetime] = Field(default=None, description="When the technician record was created (RFC3339).")
     deleted_at: Optional[datetime] = Field(default=None, description="Set (RFC3339) only when the technician has been soft-removed; omitted otherwise.")
     email: Optional[StrictStr] = Field(default=None, description="Email address; null if not set.")
@@ -57,7 +60,7 @@ class Technician(BaseModel):
     updated_at: Optional[datetime] = Field(default=None, description="When the technician record was last modified (RFC3339).")
     user_id: Optional[StrictStr] = Field(default=None, description="UUID of the underlying user account.")
     vehicle_ids: Optional[List[StrictStr]] = Field(default=None, description="UUIDs of the vehicles this technician uses.")
-    __properties: ClassVar[List[str]] = ["address", "assignment_tier", "buddy_ids", "business_group_id", "business_id", "created_at", "deleted_at", "email", "full_name", "id", "job_title", "join_date", "last_login_at", "leads", "left_at", "phone", "role", "role_key", "service_areas", "start_location_lat", "start_location_long", "start_location_type", "status", "updated_at", "user_id", "vehicle_ids"]
+    __properties: ClassVar[List[str]] = ["address", "assignment_tier", "buddy_ids", "business_group_id", "business_id", "calendar_nudge_due_at", "calendar_nudged_at", "calendar_requested_at", "created_at", "deleted_at", "email", "full_name", "id", "job_title", "join_date", "last_login_at", "leads", "left_at", "phone", "role", "role_key", "service_areas", "start_location_lat", "start_location_long", "start_location_type", "status", "updated_at", "user_id", "vehicle_ids"]
 
     @field_validator('assignment_tier')
     def assignment_tier_validate_enum(cls, value):
@@ -162,6 +165,9 @@ class Technician(BaseModel):
             "buddy_ids": obj.get("buddy_ids"),
             "business_group_id": obj.get("business_group_id"),
             "business_id": obj.get("business_id"),
+            "calendar_nudge_due_at": obj.get("calendar_nudge_due_at"),
+            "calendar_nudged_at": obj.get("calendar_nudged_at"),
+            "calendar_requested_at": obj.get("calendar_requested_at"),
             "created_at": obj.get("created_at"),
             "deleted_at": obj.get("deleted_at"),
             "email": obj.get("email"),

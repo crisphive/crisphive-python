@@ -21,6 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from typing import Any, ClassVar, Dict, List, Optional
 from crisphive.models.customer_contact import CustomerContact
 from crisphive.models.customer_profile import CustomerProfile
+from crisphive.models.customer_quick_books_link import CustomerQuickBooksLink
 from crisphive.models.customer_spending import CustomerSpending
 from typing import Optional, Set
 from typing_extensions import Self
@@ -31,8 +32,9 @@ class Customer(BaseModel):
     """ # noqa: E501
     contact: Optional[CustomerContact] = Field(default=None, description="Contact details: address, phone, email, preferred technician, service area.")
     profile: Optional[CustomerProfile] = Field(default=None, description="Core identity and lifecycle fields.")
+    quickbooks: Optional[CustomerQuickBooksLink] = Field(default=None, description="The customer's QuickBooks Online counterpart; null when this customer is not linked to one, and for every business without the integration.")
     spending: Optional[CustomerSpending] = Field(default=None, description="Spending aggregates over the trailing 12 months.")
-    __properties: ClassVar[List[str]] = ["contact", "profile", "spending"]
+    __properties: ClassVar[List[str]] = ["contact", "profile", "quickbooks", "spending"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -79,6 +81,9 @@ class Customer(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of profile
         if self.profile:
             _dict['profile'] = self.profile.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of quickbooks
+        if self.quickbooks:
+            _dict['quickbooks'] = self.quickbooks.to_dict()
         # override the default output from pydantic by calling `to_dict()` of spending
         if self.spending:
             _dict['spending'] = self.spending.to_dict()
@@ -96,6 +101,7 @@ class Customer(BaseModel):
         _obj = cls.model_validate({
             "contact": CustomerContact.from_dict(obj["contact"]) if obj.get("contact") is not None else None,
             "profile": CustomerProfile.from_dict(obj["profile"]) if obj.get("profile") is not None else None,
+            "quickbooks": CustomerQuickBooksLink.from_dict(obj["quickbooks"]) if obj.get("quickbooks") is not None else None,
             "spending": CustomerSpending.from_dict(obj["spending"]) if obj.get("spending") is not None else None
         })
         return _obj

@@ -22,6 +22,7 @@ from crisphive.api.business_skill_api import BusinessSkillApi
 from crisphive.api.customer_api import CustomerApi
 from crisphive.api.job_request_business_api import JobRequestBusinessApi
 from crisphive.api.job_types_api import JobTypesApi
+from crisphive.api.permission_api import PermissionApi
 from crisphive.api.service_area_api import ServiceAreaApi
 from crisphive.api.technician_api import TechnicianApi
 from crisphive.api.technician_time_off_api import TechnicianTimeOffApi
@@ -41,6 +42,7 @@ from crisphive.exceptions import ApiException
 # import models into sdk package
 from crisphive.models.api_internal_techtimeoff_actions import ApiInternalTechtimeoffActions
 from crisphive.models.api_internal_techtimeoff_status import ApiInternalTechtimeoffStatus
+from crisphive.models.assignable_group import AssignableGroup
 from crisphive.models.book_and_confirm_job_request200_response import BookAndConfirmJobRequest200Response
 from crisphive.models.commit_absence_resolve200_response import CommitAbsenceResolve200Response
 from crisphive.models.commit_emergency_reschedule200_response import CommitEmergencyReschedule200Response
@@ -64,6 +66,7 @@ from crisphive.models.customer_create_response import CustomerCreateResponse
 from crisphive.models.customer_list import CustomerList
 from crisphive.models.customer_list_item import CustomerListItem
 from crisphive.models.customer_profile import CustomerProfile
+from crisphive.models.customer_quick_books_link import CustomerQuickBooksLink
 from crisphive.models.customer_service_area_ref import CustomerServiceAreaRef
 from crisphive.models.customer_spending import CustomerSpending
 from crisphive.models.customer_technician_ref import CustomerTechnicianRef
@@ -107,6 +110,8 @@ from crisphive.models.job_request_available_vehicle import JobRequestAvailableVe
 from crisphive.models.job_request_blocker import JobRequestBlocker
 from crisphive.models.job_request_blocker_ref import JobRequestBlockerRef
 from crisphive.models.job_request_book_and_confirm_customer import JobRequestBookAndConfirmCustomer
+from crisphive.models.job_request_book_and_confirm_emergency import JobRequestBookAndConfirmEmergency
+from crisphive.models.job_request_book_and_confirm_emergency_result import JobRequestBookAndConfirmEmergencyResult
 from crisphive.models.job_request_book_and_confirm_refusal import JobRequestBookAndConfirmRefusal
 from crisphive.models.job_request_book_and_confirm_request import JobRequestBookAndConfirmRequest
 from crisphive.models.job_request_book_and_confirm_response import JobRequestBookAndConfirmResponse
@@ -128,6 +133,7 @@ from crisphive.models.job_request_emergency_candidate import JobRequestEmergency
 from crisphive.models.job_request_emergency_candidates import JobRequestEmergencyCandidates
 from crisphive.models.job_request_emergency_candidates_request import JobRequestEmergencyCandidatesRequest
 from crisphive.models.job_request_emergency_commit_request import JobRequestEmergencyCommitRequest
+from crisphive.models.job_request_emergency_inline_job import JobRequestEmergencyInlineJob
 from crisphive.models.job_request_emergency_plan import JobRequestEmergencyPlan
 from crisphive.models.job_request_emergency_preview_request import JobRequestEmergencyPreviewRequest
 from crisphive.models.job_request_job_date_business_range_request import JobRequestJobDateBusinessRangeRequest
@@ -141,6 +147,7 @@ from crisphive.models.job_request_move_plan import JobRequestMovePlan
 from crisphive.models.job_request_move_preview_req import JobRequestMovePreviewReq
 from crisphive.models.job_request_move_warning import JobRequestMoveWarning
 from crisphive.models.job_request_period import JobRequestPeriod
+from crisphive.models.job_request_priority_update_result import JobRequestPriorityUpdateResult
 from crisphive.models.job_request_quote_request import JobRequestQuoteRequest
 from crisphive.models.job_request_quote_summary import JobRequestQuoteSummary
 from crisphive.models.job_request_rating_summary import JobRequestRatingSummary
@@ -167,6 +174,7 @@ from crisphive.models.job_type import JobType
 from crisphive.models.job_type_create_request import JobTypeCreateRequest
 from crisphive.models.job_type_create_response import JobTypeCreateResponse
 from crisphive.models.job_type_update_request import JobTypeUpdateRequest
+from crisphive.models.list_assignable_groups200_response import ListAssignableGroups200Response
 from crisphive.models.list_crew_candidates200_response import ListCrewCandidates200Response
 from crisphive.models.list_customers200_response import ListCustomers200Response
 from crisphive.models.list_emergency_candidates200_response import ListEmergencyCandidates200Response
@@ -188,6 +196,7 @@ from crisphive.models.list_webhook_event_types200_response import ListWebhookEve
 from crisphive.models.nearby_technician import NearbyTechnician
 from crisphive.models.nearby_technicians import NearbyTechnicians
 from crisphive.models.pagination import Pagination
+from crisphive.models.quote_job_request200_response import QuoteJobRequest200Response
 from crisphive.models.replace_technician_service_areas200_response import ReplaceTechnicianServiceAreas200Response
 from crisphive.models.response_envelope import ResponseEnvelope
 from crisphive.models.service_area import ServiceArea

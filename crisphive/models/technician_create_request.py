@@ -30,9 +30,9 @@ class TechnicianCreateRequest(BaseModel):
     TechnicianCreateRequest
     """ # noqa: E501
     address: Optional[TechnicianAddressInput] = Field(default=None, description="Home address (the day-start point when start_location_type=home).")
-    assignment_tier: Optional[StrictStr] = Field(default=None, description="Crew tier the matching engine assigns by: lead (can head a job), buddy (crew helper), float (excluded from auto crew-assign).")
+    assignment_tier: Optional[StrictStr] = Field(default=None, description="Crew tier the matching engine assigns by: lead (can head a job), buddy (crew helper), float (excluded from auto crew-assign). IGNORED — stored empty, no error — when the role is Booking Coordinator, Administrator or Viewer: office roles are never assigned jobs. Technician, Owner, Supervisor and custom roles keep the tier.")
     buddy_ids: Optional[Annotated[List[StrictStr], Field(max_length=50)]] = Field(default=None, description="Buddies of this technician (set when creating a lead). Optional; max 50 technician ids.")
-    business_group_id: StrictStr = Field(description="Role group for the new member. Discover IDs via GET /permission/groups (Owner/Administrator groups are rejected in sandbox mode).")
+    business_group_id: Optional[StrictStr] = Field(default=None, description="Role group for the new member. Optional: omitted or empty assigns the business's Technician group. To assign another group, copy its ID from the dashboard (Settings → Permissions) or from an existing member's `business_group_id`. Owner/Administrator groups are rejected in sandbox mode and for API-key callers.")
     email: Optional[Annotated[str, Field(strict=True, max_length=255)]] = Field(default=None, description="Email address. At least one of phone/email is required (identity resolution key).")
     full_name: Annotated[str, Field(strict=True, max_length=255)] = Field(description="The person's full display name. Required; max 255 chars.")
     job_title: Optional[Annotated[str, Field(strict=True, max_length=255)]] = Field(default=None, description="Display title (e.g. \"Senior HVAC Technician\").")

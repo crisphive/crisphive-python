@@ -30,7 +30,7 @@ class TechnicianUpdateRequest(BaseModel):
     TechnicianUpdateRequest
     """ # noqa: E501
     address: Optional[TechnicianAddressInput] = Field(default=None, description="Home address (the day-start point when start_location_type=home).")
-    assignment_tier: Optional[StrictStr] = Field(default=None, description="Crew tier: lead / buddy / float (float = excluded from auto crew-assign).")
+    assignment_tier: Optional[StrictStr] = Field(default=None, description="Crew tier: lead / buddy / float (float = excluded from auto crew-assign). IGNORED (stored empty, no error) for Booking Coordinator, Administrator and Viewer — office roles are never assigned jobs, so moving a member into one of them clears the tier.")
     business_group_id: StrictStr = Field(description="Role group. Discover IDs via GET /permission/groups.")
     email: Optional[Annotated[str, Field(strict=True, max_length=255)]] = Field(default=None, description="Email address. At least one of phone/email is required.")
     full_name: Annotated[str, Field(strict=True, max_length=255)] = Field(description="The person's full display name. Required; max 255 chars.")

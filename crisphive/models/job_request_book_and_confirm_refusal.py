@@ -29,7 +29,7 @@ class JobRequestBookAndConfirmRefusal(BaseModel):
     data: Optional[Any] = Field(default=None, description="The step's structured detail (e.g. blockers[], earliest_feasible_at), unchanged.")
     error_code: Optional[StrictStr] = Field(default=None, description="The step's stable error code, e.g. JOB_REQUEST_NO_TECHNICIAN_AVAILABLE — same meaning as on quoteJobRequest / confirmJobRequest.")
     message: Optional[StrictStr] = Field(default=None, description="The step's English default message. Branch on error_code, never on this text.")
-    stage: Optional[StrictStr] = Field(default=None, description="Which step refused: quote or confirm.")
+    stage: Optional[StrictStr] = Field(default=None, description="Which step refused: quote, confirm, or dispatch (the P0 cascade).")
     __properties: ClassVar[List[str]] = ["data", "error_code", "message", "stage"]
 
     @field_validator('stage')
@@ -38,8 +38,8 @@ class JobRequestBookAndConfirmRefusal(BaseModel):
         if value is None:
             return value
 
-        if value not in set(['quote', 'confirm']):
-            raise ValueError("must be one of enum values ('quote', 'confirm')")
+        if value not in set(['quote', 'confirm', 'dispatch']):
+            raise ValueError("must be one of enum values ('quote', 'confirm', 'dispatch')")
         return value
 
     model_config = ConfigDict(

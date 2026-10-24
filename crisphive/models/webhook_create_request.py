@@ -28,7 +28,7 @@ class WebhookCreateRequest(BaseModel):
     WebhookCreateRequest
     """ # noqa: E501
     description: Optional[Annotated[str, Field(strict=True, max_length=255)]] = Field(default=None, description="Optional human label shown in the dashboard.")
-    event_types: Optional[Annotated[List[StrictStr], Field(max_length=50)]] = Field(default=None, description="Event types to receive. Empty = ALL events. See GET /business/webhooks/event-types.")
+    event_types: Optional[Annotated[List[StrictStr], Field(max_length=50)]] = Field(default=None, description="Event types to receive. Empty = every event the credential may READ (customer.* needs customers_view, technician.* team_view, job_request.* job_view); naming one it cannot read is WEBHOOK_EVENT_NOT_PERMITTED. See GET /business/webhooks/event-types.")
     expires_in_days: Optional[Annotated[int, Field(le=365, strict=True, ge=1)]] = Field(default=None, description="Signing-secret lifetime in days. Omit for the 30-day default; 1..365 to choose your own. When it lapses the endpoint stops delivering until you rotate — see POST /business/webhooks/{id}/rotate-secret.")
     url: StrictStr = Field(description="HTTPS callback URL Crisphive will POST events to. Required; absolute http(s).")
     __properties: ClassVar[List[str]] = ["description", "event_types", "expires_in_days", "url"]

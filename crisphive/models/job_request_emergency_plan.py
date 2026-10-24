@@ -18,7 +18,7 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from crisphive.models.job_request_move_warning import JobRequestMoveWarning
 from crisphive.models.job_request_reassign_fallback import JobRequestReassignFallback
@@ -31,10 +31,11 @@ class JobRequestEmergencyPlan(BaseModel):
     """
     JobRequestEmergencyPlan
     """ # noqa: E501
+    after_hours_override_required: Optional[StrictBool] = Field(default=None, description="True on a PREVIEW onto a day the business does not work, sent without after_hours_override. The cascade is shown as the override would place it; to commit, confirm the coordinator has phoned the technician and send after_hours_override=true. Always false on a commit.")
     business_timezone: Optional[StrictStr] = Field(default=None, description="IANA timezone the per-day groupings are rendered in.")
     days: Optional[List[JobRequestRescheduleDay]] = Field(default=None, description="Pushed jobs grouped per business-local calendar day.")
     emergency_end: Optional[datetime] = Field(default=None, description="Emergency visit window end (UTC) — start + the quoted visit duration (job + mobilization + demobilization).")
-    emergency_job_id: Optional[StrictStr] = Field(default=None, description="ID of the inserted P0 job.")
+    emergency_job_id: Optional[StrictStr] = Field(default=None, description="ID of the inserted P0 job. Absent for a probe -- a `job` that does not exist yet.")
     emergency_start: Optional[datetime] = Field(default=None, description="Emergency visit window start (UTC).")
     mode: Optional[StrictStr] = Field(default=None, description="Cascade mode the plan assumed (overtime | next_day).")
     reassign_fallbacks: Optional[List[JobRequestReassignFallback]] = Field(default=None, description="ReassignFallbacks: one entry per displaced job that reassign mode could NOT re-staff, and therefore left in days[].moves[] to be rescheduled. Empty in reschedule mode. Read this INSTEAD of inferring \"nobody was free\" from an empty reassignments[] — the two are different states (no fallbacks + empty reassignments means nothing was displaced at all).")
@@ -42,7 +43,7 @@ class JobRequestEmergencyPlan(BaseModel):
     technician_id: Optional[StrictStr] = Field(default=None, description="Technician the emergency lands on.")
     total_moves: Optional[StrictInt] = Field(default=None, description="Number of displaced jobs pushed to a later window.")
     warnings: Optional[List[JobRequestMoveWarning]] = Field(default=None, description="Non-blocking consequences the coordinator accepts by committing (TIME_OFF_OVERLAP per displaced job landing in the tech's approved leave, CALENDAR_OVERLAP per displaced job landing on a personal calendar event).")
-    __properties: ClassVar[List[str]] = ["business_timezone", "days", "emergency_end", "emergency_job_id", "emergency_start", "mode", "reassign_fallbacks", "reassignments", "technician_id", "total_moves", "warnings"]
+    __properties: ClassVar[List[str]] = ["after_hours_override_required", "business_timezone", "days", "emergency_end", "emergency_job_id", "emergency_start", "mode", "reassign_fallbacks", "reassignments", "technician_id", "total_moves", "warnings"]
 
     @field_validator('mode')
     def mode_validate_enum(cls, value):
@@ -133,6 +134,7 @@ class JobRequestEmergencyPlan(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "after_hours_override_required": obj.get("after_hours_override_required"),
             "business_timezone": obj.get("business_timezone"),
             "days": [JobRequestRescheduleDay.from_dict(_item) for _item in obj["days"]] if obj.get("days") is not None else None,
             "emergency_end": obj.get("emergency_end"),

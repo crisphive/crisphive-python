@@ -33,7 +33,7 @@ class JobRequestEmergencyCandidates(BaseModel):
     candidates: Optional[List[JobRequestEmergencyCandidate]] = Field(default=None, description="Technicians ranked fastest-arrival first; each carries its displacement preview.")
     crew_recommendation: Optional[JobRequestCrewRecommendation] = Field(default=None, description="Historical crew-size suggestion (FR-1) — ALWAYS advisory; confirm or override before dispatch. sample_size=0 = no history, size defaults to 1.")
     emergency_end: Optional[datetime] = Field(default=None, description="Emergency visit window end (UTC) — start + the quoted visit duration.")
-    emergency_job_id: Optional[StrictStr] = Field(default=None, description="ID of the P0 job being placed.")
+    emergency_job_id: Optional[StrictStr] = Field(default=None, description="ID of the P0 job being placed. Absent for a probe -- a `job` that does not exist yet.")
     emergency_start: Optional[datetime] = Field(default=None, description="Emergency visit window start (UTC).")
     mode: Optional[StrictStr] = Field(default=None, description="Reschedule mode the displacement previews assume (overtime | next_day).")
     __properties: ClassVar[List[str]] = ["business_timezone", "candidates", "crew_recommendation", "emergency_end", "emergency_job_id", "emergency_start", "mode"]

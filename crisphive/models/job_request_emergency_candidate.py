@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional, Union
 from crisphive.models.job_request_move_warning import JobRequestMoveWarning
 from crisphive.models.job_request_reschedule_day import JobRequestRescheduleDay
@@ -29,6 +29,7 @@ class JobRequestEmergencyCandidate(BaseModel):
     JobRequestEmergencyCandidate
     """ # noqa: E501
     booked_minutes: Optional[StrictInt] = Field(default=None, description="Minutes of work already booked on this technician that day (workload context).")
+    calendar_busy: Optional[StrictBool] = Field(default=None, description="True when this technician overlaps a PERSONAL-calendar window and is offered anyway, flagged and sorted last, for you to decide on. Render it as \"has a personal commitment then — phone them before choosing\", never as a recommendation. The event's hours are deliberately NOT disclosed: the platform stores no title and the times are a private commitment.")
     days: Optional[List[JobRequestRescheduleDay]] = Field(default=None, description="The displaced jobs, grouped per business-local day (same shape as the preview endpoint) — what the coordinator reviews before committing.")
     distance_km: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Estimated distance from the tech's start location to the site, in kilometers.")
     full_name: Optional[StrictStr] = Field(default=None, description="Candidate technician's full name.")
@@ -37,8 +38,8 @@ class JobRequestEmergencyCandidate(BaseModel):
     total_moves: Optional[StrictInt] = Field(default=None, description="How many jobs choosing this tech would push (0 = free slot).")
     total_score: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="Smart-assign engine ranking score (higher = better fit).")
     travel_minutes: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, description="ETA estimate in minutes from the tech's start location to the site — static origin (no live GPS), rank hint not a promise.")
-    warnings: Optional[List[JobRequestMoveWarning]] = Field(default=None, description="Per-technician warnings, e.g. TIME_OFF_OVERLAP when this technician is on approved leave at the requested time (only reachable with after_hours_override, which stops leave from rejecting).")
-    __properties: ClassVar[List[str]] = ["booked_minutes", "days", "distance_km", "full_name", "matched_skills", "technician_id", "total_moves", "total_score", "travel_minutes", "warnings"]
+    warnings: Optional[List[JobRequestMoveWarning]] = Field(default=None, description="Per-technician warnings: TIME_OFF_OVERLAP when this technician is on approved leave at the requested time (only reachable with after_hours_override, which stops leave from rejecting), and CALENDAR_OVERLAP alongside calendar_busy above.")
+    __properties: ClassVar[List[str]] = ["booked_minutes", "calendar_busy", "days", "distance_km", "full_name", "matched_skills", "technician_id", "total_moves", "total_score", "travel_minutes", "warnings"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -106,6 +107,7 @@ class JobRequestEmergencyCandidate(BaseModel):
 
         _obj = cls.model_validate({
             "booked_minutes": obj.get("booked_minutes"),
+            "calendar_busy": obj.get("calendar_busy"),
             "days": [JobRequestRescheduleDay.from_dict(_item) for _item in obj["days"]] if obj.get("days") is not None else None,
             "distance_km": obj.get("distance_km"),
             "full_name": obj.get("full_name"),

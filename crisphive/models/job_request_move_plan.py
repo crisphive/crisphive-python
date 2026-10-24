@@ -18,7 +18,7 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from crisphive.models.job_request_crew_change import JobRequestCrewChange
 from crisphive.models.job_request_move_member import JobRequestMoveMember
@@ -31,6 +31,7 @@ class JobRequestMovePlan(BaseModel):
     """
     JobRequestMovePlan
     """ # noqa: E501
+    after_hours_override_required: Optional[StrictBool] = Field(default=None, description="True on a PREVIEW that lands a p0 single-person job on a day the business does not work, sent without after_hours_override. The plan is shown as the override would place it; to commit it, ask the coordinator whether they have phoned the technician and send after_hours_override=true. Always false on a commit (a commit without the flag refuses instead).")
     business_timezone: Optional[StrictStr] = Field(default=None, description="IANA timezone the per-day groupings are rendered in.")
     crew_changes: Optional[List[JobRequestCrewChange]] = Field(default=None, description="Crew-job move: proposed member swaps (current member busy at the new time → auto-replaced by the best same-tier candidate). Committing the plan approves them. Omitted for single-person jobs / no swaps.")
     days: Optional[List[JobRequestRescheduleDay]] = Field(default=None, description="Displaced jobs grouped per business-local calendar day.")
@@ -44,7 +45,7 @@ class JobRequestMovePlan(BaseModel):
     technician_id: Optional[StrictStr] = Field(default=None, description="UUID of the technician the job lands on.")
     total_moves: Optional[StrictInt] = Field(default=None, description="Number of displaced jobs pushed to a later window.")
     warnings: Optional[List[JobRequestMoveWarning]] = Field(default=None, description="Non-blocking consequences the coordinator accepts by committing.")
-    __properties: ClassVar[List[str]] = ["business_timezone", "crew_changes", "days", "job_id", "members", "mode", "new_end", "new_start", "previous_technician_id", "short_code", "technician_id", "total_moves", "warnings"]
+    __properties: ClassVar[List[str]] = ["after_hours_override_required", "business_timezone", "crew_changes", "days", "job_id", "members", "mode", "new_end", "new_start", "previous_technician_id", "short_code", "technician_id", "total_moves", "warnings"]
 
     @field_validator('mode')
     def mode_validate_enum(cls, value):
@@ -135,6 +136,7 @@ class JobRequestMovePlan(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "after_hours_override_required": obj.get("after_hours_override_required"),
             "business_timezone": obj.get("business_timezone"),
             "crew_changes": [JobRequestCrewChange.from_dict(_item) for _item in obj["crew_changes"]] if obj.get("crew_changes") is not None else None,
             "days": [JobRequestRescheduleDay.from_dict(_item) for _item in obj["days"]] if obj.get("days") is not None else None,

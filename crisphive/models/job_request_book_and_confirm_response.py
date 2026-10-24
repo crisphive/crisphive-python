@@ -20,6 +20,7 @@ import json
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
+from crisphive.models.job_request_book_and_confirm_emergency_result import JobRequestBookAndConfirmEmergencyResult
 from crisphive.models.job_request_book_and_confirm_refusal import JobRequestBookAndConfirmRefusal
 from typing import Optional, Set
 from typing_extensions import Self
@@ -32,11 +33,12 @@ class JobRequestBookAndConfirmResponse(BaseModel):
     confirmed: Optional[StrictBool] = Field(default=None, description="True when the job is confirmed at scheduled_at with a technician assigned. False means the job exists, quoted and waiting in the coordinator's queue, and `refusal` says why it could not be confirmed.")
     customer_id: Optional[StrictStr] = Field(default=None, description="The customer the job is booked for (matched or newly created).")
     customer_url: Optional[StrictStr] = Field(default=None, description="The customer's self-service link for this job.")
+    emergency: Optional[JobRequestBookAndConfirmEmergencyResult] = Field(default=None, description="The P0 dispatch, echoed back. Present whenever the request carried `emergency`.")
     job_id: Optional[StrictStr] = Field(default=None, description="The job that was created. Present on every 200 — once booked, a job is never discarded.")
     refusal: Optional[JobRequestBookAndConfirmRefusal] = Field(default=None, description="Why the job is not confirmed. Present only when confirmed is false.")
     scheduled_at: Optional[datetime] = Field(default=None, description="Confirmed start (UTC). Present when confirmed.")
     short_code: Optional[StrictStr] = Field(default=None, description="Human-friendly job code to read back to a caller.")
-    __properties: ClassVar[List[str]] = ["assigned_technician_id", "confirmed", "customer_id", "customer_url", "job_id", "refusal", "scheduled_at", "short_code"]
+    __properties: ClassVar[List[str]] = ["assigned_technician_id", "confirmed", "customer_id", "customer_url", "emergency", "job_id", "refusal", "scheduled_at", "short_code"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -77,6 +79,9 @@ class JobRequestBookAndConfirmResponse(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of emergency
+        if self.emergency:
+            _dict['emergency'] = self.emergency.to_dict()
         # override the default output from pydantic by calling `to_dict()` of refusal
         if self.refusal:
             _dict['refusal'] = self.refusal.to_dict()
@@ -96,6 +101,7 @@ class JobRequestBookAndConfirmResponse(BaseModel):
             "confirmed": obj.get("confirmed"),
             "customer_id": obj.get("customer_id"),
             "customer_url": obj.get("customer_url"),
+            "emergency": JobRequestBookAndConfirmEmergencyResult.from_dict(obj["emergency"]) if obj.get("emergency") is not None else None,
             "job_id": obj.get("job_id"),
             "refusal": JobRequestBookAndConfirmRefusal.from_dict(obj["refusal"]) if obj.get("refusal") is not None else None,
             "scheduled_at": obj.get("scheduled_at"),

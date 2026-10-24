@@ -23,6 +23,7 @@ from typing import Any, ClassVar, Dict, List, Optional
 from typing_extensions import Annotated
 from crisphive.models.internal_jobrequest_http_address_req import InternalJobrequestHttpAddressReq
 from crisphive.models.job_request_book_and_confirm_customer import JobRequestBookAndConfirmCustomer
+from crisphive.models.job_request_book_and_confirm_emergency import JobRequestBookAndConfirmEmergency
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -30,17 +31,20 @@ class JobRequestBookAndConfirmRequest(BaseModel):
     """
     JobRequestBookAndConfirmRequest
     """ # noqa: E501
-    address: Optional[InternalJobrequestHttpAddressReq] = Field(default=None, description="Service address. REQUIRED with `customer`; ignored with `customer_id` (the stored customer address is used). Missing coordinates are geocoded.")
+    address: Optional[InternalJobrequestHttpAddressReq] = Field(default=None, description="Service address. REQUIRED with `customer`. OPTIONAL with `customer_id`: when sent it is used for THIS JOB and the stored customer address is only the fallback when it is omitted — it is never written back to the customer record. Missing coordinates are geocoded.")
     customer: Optional[JobRequestBookAndConfirmCustomer] = Field(default=None, description="A caller who may or may not exist yet: matched by phone/email against the business's customers (no duplicate is created for a known caller), created otherwise. Send this OR `customer_id`.")
     customer_id: Optional[StrictStr] = Field(default=None, description="UUID of an existing customer. Send this OR `customer`, not both.")
+    demobilization_minutes: Optional[Annotated[int, Field(strict=True, ge=0)]] = Field(default=None, description="Demobilization (teardown) minutes after the work, min 0 — same rules as mobilization_minutes.")
     description: Optional[Annotated[str, Field(strict=True, max_length=2000)]] = Field(default=None, description="Free-text description of the work. Optional; max 2000 chars.")
+    emergency: Optional[JobRequestBookAndConfirmEmergency] = Field(default=None, description="P0 dispatch. Present only with priority p0 (or a business whose default priority is p0). See the endpoint description.")
     job_duration_minutes: Optional[Annotated[int, Field(strict=True, ge=1)]] = Field(default=None, description="Hands-on work minutes. Optional when the job type has a default_duration_minutes.")
     job_type_id: Optional[StrictStr] = Field(default=None, description="UUID of the job type: it classifies the job and supplies default_duration_minutes when job_duration_minutes is omitted. Optional: omitted, the business's DEFAULT job type (is_default, the seeded \"General\", 60 min + 15 + 15 unless the business changed it) is used.")
+    mobilization_minutes: Optional[Annotated[int, Field(strict=True, ge=0)]] = Field(default=None, description="Mobilization (setup/travel-prep) minutes before the work, min 0 — same meaning as on quoteJobRequest. Optional: omitted, the job type's default_mobilization_minutes applies when job_duration_minutes is ALSO omitted, and 0 when you sent a duration (an explicit duration is never mixed with the type's buffers). A value you send always wins. Counted when checking whether a pinned technician_id is free.")
     priority: Optional[StrictStr] = Field(default=None, description="Scheduling priority p0–p3. Optional; omitted = the business default.")
     scheduled_at: Optional[datetime] = Field(default=None, description="Start time — a BUSINESS-LOCAL wall clock, same rule as confirmJobRequest: canonical `2026-09-30T10:00:00`, seconds optional, a space may replace the T; an offset is accepted only when it agrees with the business timezone. Must be in the future.")
     skill_ids: Optional[Annotated[List[StrictStr], Field(max_length=20)]] = Field(default=None, description="UUIDs of skills the work needs. Optional; up to 20.")
     technician_id: Optional[StrictStr] = Field(default=None, description="Force a specific lead technician (feasibility still enforced). Omit to let Crisphive pick.")
-    __properties: ClassVar[List[str]] = ["address", "customer", "customer_id", "description", "job_duration_minutes", "job_type_id", "priority", "scheduled_at", "skill_ids", "technician_id"]
+    __properties: ClassVar[List[str]] = ["address", "customer", "customer_id", "demobilization_minutes", "description", "emergency", "job_duration_minutes", "job_type_id", "mobilization_minutes", "priority", "scheduled_at", "skill_ids", "technician_id"]
 
     @field_validator('priority')
     def priority_validate_enum(cls, value):
@@ -97,6 +101,9 @@ class JobRequestBookAndConfirmRequest(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of customer
         if self.customer:
             _dict['customer'] = self.customer.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of emergency
+        if self.emergency:
+            _dict['emergency'] = self.emergency.to_dict()
         return _dict
 
     @classmethod
@@ -112,9 +119,12 @@ class JobRequestBookAndConfirmRequest(BaseModel):
             "address": InternalJobrequestHttpAddressReq.from_dict(obj["address"]) if obj.get("address") is not None else None,
             "customer": JobRequestBookAndConfirmCustomer.from_dict(obj["customer"]) if obj.get("customer") is not None else None,
             "customer_id": obj.get("customer_id"),
+            "demobilization_minutes": obj.get("demobilization_minutes"),
             "description": obj.get("description"),
+            "emergency": JobRequestBookAndConfirmEmergency.from_dict(obj["emergency"]) if obj.get("emergency") is not None else None,
             "job_duration_minutes": obj.get("job_duration_minutes"),
             "job_type_id": obj.get("job_type_id"),
+            "mobilization_minutes": obj.get("mobilization_minutes"),
             "priority": obj.get("priority"),
             "scheduled_at": obj.get("scheduled_at"),
             "skill_ids": obj.get("skill_ids"),
